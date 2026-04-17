@@ -1945,6 +1945,63 @@ if('serviceWorker' in navigator){
   });
 }
 
+// ── Shake to Roll ─────────────────────────────────────────────────────────────
+(function(){
+  const THRESHOLD = 18;   // m/s² — how hard a shake needs to be
+  const COOLDOWN  = 1200; // ms between triggered shakes
+  let lastX=0,lastY=0,lastZ=0,lastShake=0,listening=false;
+
+  function onMotion(e){
+    const a=e.accelerationIncludingGravity;
+    if(!a) return;
+    const dx=a.x-lastX, dy=a.y-lastY, dz=a.z-lastZ;
+    lastX=a.x; lastY=a.y; lastZ=a.z;
+    const force=Math.sqrt(dx*dx+dy*dy+dz*dz);
+    if(force>THRESHOLD){
+      const now=Date.now();
+      if(now-lastShake<COOLDOWN) return;
+      lastShake=now;
+      triggerShake();
+    }
+  }
+
+  function triggerShake(){
+    // Try the main game roll button first, then classic mode roll button
+    for(const id of ['btn-roll','free-roll-btn']){
+      const btn=document.getElementById(id);
+      if(btn && !btn.disabled && btn.offsetParent!==null && btn.style.visibility!=='hidden'){
+        btn.click();
+        return;
+      }
+    }
+  }
+
+  function startListening(){
+    if(listening) return;
+    listening=true;
+    window.addEventListener('devicemotion', onMotion);
+  }
+
+  function requestAndStart(){
+    if(typeof DeviceMotionEvent!=='undefined' && typeof DeviceMotionEvent.requestPermission==='function'){
+      DeviceMotionEvent.requestPermission().then(state=>{
+        if(state==='granted') startListening();
+      }).catch(()=>{});
+    } else {
+      startListening(); // Android / older iOS — no permission needed
+    }
+  }
+
+  // Hook into the first tap on any roll button to request iOS permission
+  document.addEventListener('click', function onFirstTap(e){
+    const btn=e.target.closest('button');
+    if(btn && (btn.id==='btn-roll'||btn.id==='free-roll-btn')){
+      document.removeEventListener('click', onFirstTap);
+      requestAndStart();
+    }
+  }, true);
+})();
+
 // Prevent iOS Safari pull-to-refresh and overscroll bounce
 // but allow scrolling inside elements that actually scroll (e.g. how-to-play modal)
 document.addEventListener('touchmove', e => {
