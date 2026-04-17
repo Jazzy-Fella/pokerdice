@@ -19,7 +19,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { overscroll-behavior: none; background: #081f10; }
     body {
-      height: 100dvh; overflow: hidden; position: relative;
+      height: calc(100dvh + env(safe-area-inset-bottom)); overflow: hidden; position: relative;
       background:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.14'/%3E%3C/svg%3E"),
         repeating-linear-gradient(0deg,   transparent 0, transparent 3px, rgba(0,0,0,0.018) 3px, rgba(0,0,0,0.018) 4px),
