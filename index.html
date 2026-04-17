@@ -44,6 +44,7 @@
       background: rgba(0,0,0,0.35); border: 2px solid rgba(255,215,0,0.25);
       border-radius: 16px; padding: 13px 16px; cursor: pointer;
       transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      touch-action: manipulation;
     }
     .mode-card:hover { border-color: rgba(255,215,0,0.6); background: rgba(255,215,0,0.08); transform: translateX(3px); }
     .mode-card .mode-icon { font-size: 2rem; flex-shrink: 0; line-height: 1; width: 2.4rem; text-align: center; }
@@ -1341,6 +1342,7 @@ function startGame(){
 }
 function goToModeSelect(){
   clearShake();
+  document.activeElement?.blur();
   document.getElementById('overlay').classList.remove('visible');
   document.getElementById('game-screen').style.display='none';
   document.getElementById('game-change-mode-btn').style.display='none';
