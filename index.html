@@ -537,6 +537,12 @@
       <p>Betting + a wild die each turn with random twists</p>
     </div>
   </div>
+  <button id="shake-toggle-btn" onclick="toggleShakeMode()" style="
+    margin-top:10px; background:transparent; border:1px solid rgba(240,230,200,0.3);
+    color:rgba(240,230,200,0.55); border-radius:50px; padding:8px 20px;
+    font-size:0.78rem; font-family:'Georgia',serif; cursor:pointer;
+    touch-action:manipulation; transition:color 0.2s, border-color 0.2s, background 0.2s;
+  ">📳 Enable Shake Mode</button>
 </div>
 
 <!-- ── PLAYER SETUP ─────────────────────────────────────────────────── -->
@@ -1946,61 +1952,94 @@ if('serviceWorker' in navigator){
 }
 
 // ── Shake to Roll ─────────────────────────────────────────────────────────────
+let shakeEnabled = false;
+
 (function(){
-  const THRESHOLD = 18;   // m/s² — how hard a shake needs to be
-  const COOLDOWN  = 1200; // ms between triggered shakes
-  let lastX=0,lastY=0,lastZ=0,lastShake=0,listening=false;
+  const THRESHOLD   = 16;  // m/s² — how hard counts as motion
+  const MIN_INTERVAL= 280; // ms minimum between clicks while shaking
+  const STOP_DELAY  = 500; // ms of stillness before "final roll" fires
+
+  let lastX=0,lastY=0,lastZ=0;
+  let lastFire=0, stopTimer=null, motionListening=false;
+  let wasShaking=false;
+
+  function findRollBtn(){
+    for(const id of ['btn-roll','free-roll-btn']){
+      const btn=document.getElementById(id);
+      if(btn && !btn.disabled && btn.offsetParent!==null && btn.style.visibility!=='hidden')
+        return btn;
+    }
+    return null;
+  }
 
   function onMotion(e){
+    if(!shakeEnabled) return;
     const a=e.accelerationIncludingGravity;
     if(!a) return;
     const dx=a.x-lastX, dy=a.y-lastY, dz=a.z-lastZ;
     lastX=a.x; lastY=a.y; lastZ=a.z;
     const force=Math.sqrt(dx*dx+dy*dy+dz*dz);
+
     if(force>THRESHOLD){
+      wasShaking=true;
+      // Fire roll on each qualifying motion event
       const now=Date.now();
-      if(now-lastShake<COOLDOWN) return;
-      lastShake=now;
-      triggerShake();
+      if(now-lastFire>=MIN_INTERVAL){
+        lastFire=now;
+        findRollBtn()?.click();
+      }
+      // Reset the stop timer
+      clearTimeout(stopTimer);
+      stopTimer=setTimeout(onStopShaking, STOP_DELAY);
     }
   }
 
-  function triggerShake(){
-    // Try the main game roll button first, then classic mode roll button
-    for(const id of ['btn-roll','free-roll-btn']){
-      const btn=document.getElementById(id);
-      if(btn && !btn.disabled && btn.offsetParent!==null && btn.style.visibility!=='hidden'){
-        btn.click();
-        return;
-      }
-    }
+  function onStopShaking(){
+    if(!wasShaking) return;
+    wasShaking=false;
+    // One final roll when motion settles
+    findRollBtn()?.click();
   }
 
   function startListening(){
-    if(listening) return;
-    listening=true;
+    if(motionListening) return;
+    motionListening=true;
     window.addEventListener('devicemotion', onMotion);
   }
 
-  function requestAndStart(){
+  function requestAndStart(cb){
     if(typeof DeviceMotionEvent!=='undefined' && typeof DeviceMotionEvent.requestPermission==='function'){
       DeviceMotionEvent.requestPermission().then(state=>{
-        if(state==='granted') startListening();
-      }).catch(()=>{});
+        if(state==='granted'){ startListening(); cb(true); }
+        else cb(false);
+      }).catch(()=>cb(false));
     } else {
-      startListening(); // Android / older iOS — no permission needed
+      startListening(); cb(true); // Android / older iOS — no permission needed
     }
   }
 
-  // Hook into the first tap on any roll button to request iOS permission
-  document.addEventListener('click', function onFirstTap(e){
-    const btn=e.target.closest('button');
-    if(btn && (btn.id==='btn-roll'||btn.id==='free-roll-btn')){
-      document.removeEventListener('click', onFirstTap);
-      requestAndStart();
-    }
-  }, true);
+  window._shakeRequestAndStart = requestAndStart;
 })();
+
+function toggleShakeMode(){
+  const btn=document.getElementById('shake-toggle-btn');
+  if(shakeEnabled){
+    shakeEnabled=false;
+    btn.textContent='📳 Enable Shake Mode';
+    btn.style.color='rgba(240,230,200,0.55)';
+    btn.style.borderColor='rgba(240,230,200,0.3)';
+    btn.style.background='transparent';
+  } else {
+    window._shakeRequestAndStart(granted=>{
+      if(!granted){ alert('Motion access was denied. You can enable it in Settings → Safari → Motion & Orientation Access.'); return; }
+      shakeEnabled=true;
+      btn.textContent='📳 Shake Mode ON';
+      btn.style.color='#ffd700';
+      btn.style.borderColor='#ffd700';
+      btn.style.background='rgba(255,215,0,0.08)';
+    });
+  }
+}
 
 // Prevent iOS Safari pull-to-refresh and overscroll bounce
 // but allow scrolling inside elements that actually scroll (e.g. how-to-play modal)
