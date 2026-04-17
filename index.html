@@ -416,6 +416,17 @@
       z-index: 10;
     }
     #free-change-mode-btn:hover, #game-change-mode-btn:hover { opacity: 1; }
+    #shake-toggle-btn {
+      position: fixed; bottom: calc(env(safe-area-inset-bottom) + 14px);
+      left: 50%; transform: translateX(-50%);
+      font-size: 0.72rem; opacity: 0.6; z-index: 10;
+      background: transparent; border: 1px solid rgba(240,230,200,0.35); border-radius: 50px;
+      padding: 10px 22px; font-family: 'Georgia', serif; cursor: pointer;
+      color: #f0e6c8; touch-action: manipulation;
+      transition: opacity 0.2s, color 0.2s, border-color 0.2s;
+    }
+    #shake-toggle-btn:hover { opacity: 1; }
+    #shake-toggle-btn.shake-on { color: #ffd700; opacity: 0.85; border-color: rgba(255,215,0,0.6); }
 
     /* ── Classic Mode results overlay ───────────────── */
     #free-results-overlay {
@@ -537,13 +548,9 @@
       <p>Betting + a wild die each turn with random twists</p>
     </div>
   </div>
-  <button id="shake-toggle-btn" onclick="toggleShakeMode()" style="
-    margin-top:10px; background:transparent; border:1px solid rgba(240,230,200,0.3);
-    color:rgba(240,230,200,0.55); border-radius:50px; padding:8px 20px;
-    font-size:0.78rem; font-family:'Georgia',serif; cursor:pointer;
-    touch-action:manipulation; transition:color 0.2s, border-color 0.2s, background 0.2s;
-  ">📳 Enable Shake Mode</button>
 </div>
+
+<button id="shake-toggle-btn" onclick="toggleShakeMode()">Enable Shake Mode</button>
 
 <!-- ── PLAYER SETUP ─────────────────────────────────────────────────── -->
 <div id="player-setup">
@@ -1294,6 +1301,7 @@ function freeUpdateHand(){
 function selectMode(mode){
   gameMode=mode;
   document.getElementById('mode-select').style.display='none';
+  document.getElementById('shake-toggle-btn').style.display='none';
   const modeTitle=mode==='score'?'🎯 Score Mode':mode==='wild'?'🃏 Wild Mode':mode==='free'?'🎲 Classic Mode':'💰 Betting Mode';
   document.getElementById('setup-title').textContent=modeTitle+' — Players';
   renderSetupRows();
@@ -1340,6 +1348,7 @@ function goToModeSelect(){
   document.getElementById('free-screen').style.display='none';
   document.getElementById('free-change-mode-btn').style.display='none';
   document.getElementById('mode-select').style.display='flex';
+  document.getElementById('shake-toggle-btn').style.display='block';
 }
 
 // ── Shared turn engine ────────────────────────────────────────────────────────
@@ -2025,18 +2034,14 @@ function toggleShakeMode(){
   const btn=document.getElementById('shake-toggle-btn');
   if(shakeEnabled){
     shakeEnabled=false;
-    btn.textContent='📳 Enable Shake Mode';
-    btn.style.color='rgba(240,230,200,0.55)';
-    btn.style.borderColor='rgba(240,230,200,0.3)';
-    btn.style.background='transparent';
+    btn.textContent='Enable Shake Mode';
+    btn.classList.remove('shake-on');
   } else {
     window._shakeRequestAndStart(granted=>{
       if(!granted){ alert('Motion access was denied. You can enable it in Settings → Safari → Motion & Orientation Access.'); return; }
       shakeEnabled=true;
-      btn.textContent='📳 Shake Mode ON';
-      btn.style.color='#ffd700';
-      btn.style.borderColor='#ffd700';
-      btn.style.background='rgba(255,215,0,0.08)';
+      btn.textContent='Shake Mode ON';
+      btn.classList.add('shake-on');
     });
   }
 }
