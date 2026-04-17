@@ -1946,7 +1946,15 @@ if('serviceWorker' in navigator){
 }
 
 // Prevent iOS Safari pull-to-refresh and overscroll bounce
-document.addEventListener('touchmove', e => { e.preventDefault(); }, { passive: false });
+// but allow scrolling inside elements that actually scroll (e.g. how-to-play modal)
+document.addEventListener('touchmove', e => {
+  let el = e.target;
+  while (el && el !== document.body) {
+    if (el.scrollHeight > el.clientHeight) return; // let it scroll
+    el = el.parentElement;
+  }
+  e.preventDefault();
+}, { passive: false });
 </script>
 </body>
 </html>
