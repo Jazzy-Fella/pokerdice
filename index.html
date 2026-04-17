@@ -17,6 +17,7 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { overscroll-behavior: none; }
     body {
       height: 100dvh; overflow: hidden; position: relative;
       background:
@@ -1943,6 +1944,9 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(()=>{});
   });
 }
+
+// Prevent iOS Safari pull-to-refresh and overscroll bounce
+document.addEventListener('touchmove', e => { e.preventDefault(); }, { passive: false });
 </script>
 </body>
 </html>
