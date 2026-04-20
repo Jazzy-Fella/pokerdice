@@ -1976,13 +1976,14 @@ function wildShowPanel(idx,isCpu){
   slot.innerHTML='';
   slot.appendChild(makeWildDie(1,{unrolled:true}));
   document.getElementById('wild-outcome-text').innerHTML='';
-  document.getElementById('wild-modal-header').textContent='Roll the Wild Die';
+  const p=players[idx];
+  const headerLabel=p.name==='You'?'Your Wild Die Roll':`${p.name}'s Wild Die Roll`;
+  document.getElementById('wild-modal-header').textContent=headerLabel;
   document.getElementById('btn-wild-roll').style.display='';
   document.getElementById('btn-wild-roll').disabled=false;
   document.getElementById('btn-wild-continue').style.display='none';
   document.getElementById('wild-modal').classList.add('visible');
   setRollBtns(false,false);
-  const p=players[idx];
   if(isCpu){
     setBanner(`${p.name}'s Turn`,'cpu-turn');
     setTimeout(()=>rollWildDie(true),CPU_THINK);
