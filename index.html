@@ -171,6 +171,12 @@
       background: rgba(0,0,0,0.25); border: 2px solid rgba(255,215,0,0.18); border-radius: 20px;
       padding: 12px 16px; width: 100%; max-width: 580px;
       display: flex; flex-direction: column; align-items: center; gap: 10px;
+      transition: none !important;
+    }
+    /* Hide table chrome when betting panel is off (between players) */
+    .table.table-bp-off {
+      background: transparent !important; border-color: transparent !important;
+      padding-top: 0 !important; padding-bottom: 0 !important; gap: 0 !important;
     }
 
     /* ── Betting panel ───────────────────────────── */
@@ -1744,7 +1750,7 @@ function betStartBettingRound(){
   if(gameMode==='wild') wildDiceCount=players.map(()=>5); // reset dice counts each round
   // Keep display:flex throughout the round — use bp-off to collapse it so there's no reflow animation between players
   const bp=document.getElementById('betting-panel');
-  bp.style.display='flex'; bp.classList.add('bp-off');
+  bp.style.display='flex'; setBettingPanelOff(true);
   document.getElementById('roll-area').style.display='none';
 
   renderScoreboard();updateBelowStrip();
@@ -1769,7 +1775,7 @@ function processNextBetter(){
     renderScoreboard();updateBelowStrip();
     const wName=players[winner].name;
     const bpEl2=document.getElementById('betting-panel');
-    bpEl2.classList.remove('bp-off'); bpEl2.style.display='none';
+    setBettingPanelOff(false); bpEl2.style.display='none';
     if(gameMode==='wild'||gameMode==='bet'){
       document.getElementById('wrm-label').textContent='Everyone Folded!';
       document.getElementById('wrm-winner').textContent=wName;
@@ -1838,7 +1844,7 @@ function showBettingUI(idx){
   renderBettingStatus();
 
   setBanner(`${p.name}'s Betting Turn`,'human-turn');setStatus('');
-  document.getElementById('betting-panel').classList.remove('bp-off');
+  setBettingPanelOff(false);
 }
 
 function refreshRaiseUI(idx){
@@ -1873,10 +1879,18 @@ function playerFold()     {doFold(bActingIdx);}
 function playerCheckCall(){doCall(bActingIdx);}
 function playerRaiseBet() {doRaise(bActingIdx,bRaiseAmt);}
 
+// ── Betting panel visibility helper ──────────────────────────────────────────
+function setBettingPanelOff(off){
+  const bp=document.getElementById('betting-panel');
+  const tbl=document.querySelector('.table');
+  if(off){ bp.classList.add('bp-off'); tbl.classList.add('table-bp-off'); }
+  else   { bp.classList.remove('bp-off'); tbl.classList.remove('table-bp-off'); }
+}
+
 // ── Core betting actions ──────────────────────────────────────────────────────
 function doFold(idx){
   bFolded[idx]=true;bStatus[idx]='fold';
-  document.getElementById('betting-panel').classList.add('bp-off');
+  setBettingPanelOff(true);
   setStatus(`${players[idx].name} folds.`);
   renderScoreboard();
   setTimeout(processNextBetter,500);
@@ -1885,7 +1899,7 @@ function doCall(idx){
   const toAdd=bCurrent-bContrib[idx];
   if(toAdd>0){pState[idx].bal-=toAdd;bContrib[idx]=bCurrent;bTotalPot+=toAdd;}
   bStatus[idx]=toAdd>0?'call':'check';
-  document.getElementById('betting-panel').classList.add('bp-off');
+  setBettingPanelOff(true);
   setStatus(`${players[idx].name} ${toAdd>0?'calls.':'checks.'}`);
   renderScoreboard();updateBelowStrip();
   setTimeout(processNextBetter,400);
@@ -1904,7 +1918,7 @@ function doRaise(idx,raiseAmt){
     const ni=active[(pos+i)%active.length];
     if(!bFolded[ni])bQueue.push(ni);
   }
-  document.getElementById('betting-panel').classList.add('bp-off');
+  setBettingPanelOff(true);
   setStatus(`${players[idx].name} raises to ${fmt(newLevel)}.`);
   renderScoreboard();updateBelowStrip();
   setTimeout(processNextBetter,500);
@@ -1944,7 +1958,7 @@ function betStartRollingPhase(){
   pot=bTotalPot;bTotalPot=0;
   bActingIdx=-1;
   const bpEl=document.getElementById('betting-panel');
-  bpEl.classList.remove('bp-off'); bpEl.style.display='none';
+  setBettingPanelOff(false); bpEl.style.display='none';
   document.getElementById('roll-area').style.display='flex';
   updateBelowStrip();
   const active=activePlayers();
@@ -2117,7 +2131,7 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
   } else if(face===6){ // skip & fold
     bFolded[idx]=true; bStatus[idx]='fold';
     setStatus(`${players[idx].name} folds and is out!`);
-    document.getElementById('betting-panel').classList.add('bp-off');
+    setBettingPanelOff(true);
     renderScoreboard();
     setTimeout(()=>{
       // If only one non-folded player remains, they win uncontested
