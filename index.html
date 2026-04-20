@@ -1524,7 +1524,7 @@ function startTurn(idx){
     return;
   }
   if(isCpu){
-    setBanner(`${p.name}'s Turn`,'cpu-turn');setStatus(`${p.name} is thinking…`);
+    setBanner(`${p.name}'s Turn`,'cpu-turn');setStatus('Thinking…');
     setTimeout(cpuDoRoll,CPU_THINK);
   } else {
     setBanner(`${p.name}'s Turn — Roll the Dice!`,'human-turn');setStatus('Click Roll to start your turn');setRollBtns(true,false);
@@ -1533,7 +1533,7 @@ function startTurn(idx){
 function cpuDoRoll(){
   const p=players[currentPlayerIdx];
   if(rollsLeft===0){cpuBankCurrent();return;}
-  rollsLeft--;hasRolled=true;setStatus(`${p.name} rolling…`);
+  rollsLeft--;hasRolled=true;setStatus('Rolling…');
   animateRoll(true,()=>{
     held=cpuDecideHold(dice,rollsLeft);renderTray('dice-tray',dice,held,{isCpu:true,...wildRenderOpts()});
     const h=evalHand(dice);setHandDisplay(h.name,h.pts,true);renderRollsLeft();
@@ -1541,9 +1541,9 @@ function cpuDoRoll(){
     if(wildCharge){
       setTimeout(cpuUseWildCharge,CPU_THINK);
     } else if(rollsLeft===0||hc===5||h.pts>=75){
-      setStatus(`${p.name} kept: ${h.name}`);setTimeout(cpuBankCurrent,CPU_THINK);
+      setStatus(`Keeping: ${h.name}`);setTimeout(cpuBankCurrent,CPU_THINK);
     } else {
-      setStatus(`${p.name} holds ${hc} ${hc===1?'die':'dice'} (${h.name})…`);setTimeout(cpuDoRoll,CPU_ROLL_GAP);
+      setStatus(`Holding ${hc} ${hc===1?'die':'dice'} (${h.name})…`);setTimeout(cpuDoRoll,CPU_ROLL_GAP);
     }
   });
 }
@@ -1559,7 +1559,7 @@ function cpuUseWildCharge(){
       if(pts>bestPts){bestPts=pts;bestDieIdx=i;bestFace=candidate;}
     });
   });
-  setStatus(`${p.name} uses ★ Wild Die — sets die to ${bestFace}!`);
+  setStatus(`★ Wild Die — sets a die to ${bestFace}!`);
   dice[bestDieIdx]=bestFace;held[bestDieIdx]=true;wildCharge=false;
   renderTray('dice-tray',dice,held,{isCpu:true,...wildRenderOpts()});
   const h=evalHand(dice);setHandDisplay(h.name,h.pts,true);
@@ -1569,7 +1569,7 @@ function cpuUseWildCharge(){
 }
 function cpuBankCurrent(){
   const hand=evalHand(dice);
-  setStatus(`${players[currentPlayerIdx].name}: ${hand.name}`);
+  setStatus(hand.name);
   setBanner('','idle-turn');
   if(wildBlankIdxs.length){
     setTimeout(()=>_revealDarkDice(()=>bankHand(currentPlayerIdx,hand,[...dice])),600);
@@ -1813,7 +1813,7 @@ function processNextBetter(){
   } else {
     const bannerClass=p.isHuman?'human-turn':'cpu-turn';
     setBanner(`${p.name}'s Betting Turn`,bannerClass);
-    setStatus(`${p.name} is deciding…`);
+    setStatus('Deciding…');
     setTimeout(()=>cpuBettingAction(idx),CPU_THINK);
   }
 }
@@ -1900,7 +1900,7 @@ function setBettingPanelOff(off){
 function doFold(idx){
   bFolded[idx]=true;bStatus[idx]='fold';
   setBettingPanelOff(true);
-  setStatus(`${players[idx].name} folds.`);
+  setStatus('Folds.');
   renderScoreboard();
   setTimeout(processNextBetter,500);
 }
@@ -1909,7 +1909,7 @@ function doCall(idx){
   if(toAdd>0){pState[idx].bal-=toAdd;bContrib[idx]=bCurrent;bTotalPot+=toAdd;}
   bStatus[idx]=toAdd>0?'call':'check';
   setBettingPanelOff(true);
-  setStatus(`${players[idx].name} ${toAdd>0?'calls.':'checks.'}`);
+  setStatus(toAdd>0?'Calls.':'Checks.');
   renderScoreboard();updateBelowStrip();
   setTimeout(processNextBetter,400);
 }
@@ -1928,7 +1928,7 @@ function doRaise(idx,raiseAmt){
     if(!bFolded[ni])bQueue.push(ni);
   }
   setBettingPanelOff(true);
-  setStatus(`${players[idx].name} raises to ${fmt(newLevel)}.`);
+  setStatus(`Raises to ${fmt(newLevel)}.`);
   renderScoreboard();updateBelowStrip();
   setTimeout(processNextBetter,500);
 }
@@ -1940,25 +1940,25 @@ function cpuBettingAction(idx){
 
   if(toCall>0&&bal<toCall){
     // Can't afford to call — forced fold
-    setStatus(`${players[idx].name} can't call — folds.`);
+    setStatus("Can't call — folds.");
     setTimeout(()=>doFold(idx),CPU_THINK*0.6);
     return;
   }
   if(toCall>bal*0.5){
     // Expensive call — fold ~60% of the time
-    setStatus(`${players[idx].name} considers…`);
+    setStatus('Considering…');
     setTimeout(()=>Math.random()<0.6?doFold(idx):doCall(idx),CPU_THINK);
     return;
   }
   // Occasionally raise (15%) if no one has raised yet and they can afford it
   const noneRaised=bCurrent===MIN_ANTE;
   if(noneRaised&&bal>=toCall+MIN_RAISE*2&&Math.random()<0.15){
-    setStatus(`${players[idx].name} raises!`);
+    setStatus('Raising!');
     setTimeout(()=>doRaise(idx,MIN_RAISE),CPU_THINK);
     return;
   }
   // Otherwise call/check
-  setStatus(`${players[idx].name} ${toCall>0?'calls.':'checks.'}`);
+  setStatus(toCall>0?'Calls.':'Checks.');
   setTimeout(()=>doCall(idx),CPU_THINK*0.8);
 }
 
@@ -2140,7 +2140,7 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
     wildBlankIdxs=idxs;
   } else if(face===6){ // skip & fold
     bFolded[idx]=true; bStatus[idx]='fold';
-    setStatus(`${players[idx].name} folds and is out!`);
+    setStatus('Folds and is out!');
     setBettingPanelOff(true);
     renderScoreboard();
     setTimeout(()=>{
@@ -2181,7 +2181,7 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
   // Continue turn
   if(isCpu){
     setBanner(`${players[idx].name}'s Turn`,'cpu-turn');
-    setStatus(`${players[idx].name} is thinking…`);
+    setStatus('Thinking…');
     setTimeout(cpuDoRoll,CPU_THINK);
   } else {
     const p=players[idx];
