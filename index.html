@@ -141,6 +141,7 @@
     .ps-label   { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.07em; color: #a8c8a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .ps-value   { font-size: 1.7rem; font-weight: bold; line-height: 1.1; }
     .ps-delta   { font-size: 0.68rem; min-height: 1em; margin-top: 1px; }
+    .ps-bet-contrib { font-size: 0.55rem; color: #ffd700; letter-spacing: 0.04em; margin-top: 1px; min-height: 0.9em; }
     .ps-delta.pos { color: #7dff7d; } .ps-delta.neg { color: #ff8080; }
 
     /* Below scoreboard strip */
@@ -1189,11 +1190,13 @@ function renderScoreboard(){
     )&&!pState[i].eliminated;
     const banked=bankedThisRound.find(b=>b.idx===i);
     const isFolded=(gameMode==='bet'||gameMode==='wild')&&bFolded[i];
+    const showBetContrib=(gameMode==='bet'||gameMode==='wild')&&currentTurn==='bet'&&!pState[i].eliminated&&bContrib&&bContrib[i]>0;
     col.innerHTML=`
       <div class="ps-label" style="color:${PLAYER_COLORS[i]}">${p.name}</div>
       ${isDealer?'<div class="dealer-btn">D</div>':''}
       ${isFolded?'<div class="ps-folded-badge">Folded</div>':''}
       <div class="ps-value" style="color:${PLAYER_COLORS[i]};font-size:${valSize}" id="ps-val-${i}">${val}</div>
+      ${showBetContrib?`<div class="ps-bet-contrib">in: ${fmt(bContrib[i])}</div>`:''}
       <div class="ps-hand" id="ps-hand-${i}">${shortHand(banked)}</div>
       <div class="ps-delta" id="ps-delta-${i}">&nbsp;</div>`;
     sb.appendChild(col);
