@@ -1019,8 +1019,7 @@ function setHandDisplay(name,pts,isCpu){
   if(!name){return;}
   const c=isCpu?'cpu-turn':'human-turn';
   const kicker='';
-  const pts_str=pts>0?` <span style="font-size:0.75em;opacity:0.75">+${pts} pts</span>`:'';
-  setBanner(`${name}${pts_str}`,c,true);
+  setBanner(name,c,true);
 }
 function flashDelta(idx,val,isMoney){
   const el=document.getElementById(`ps-delta-${idx}`);
