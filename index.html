@@ -406,6 +406,23 @@
 
     .wild-badge { font-size:0.68rem; padding:3px 12px; border-radius:20px; font-weight:bold; }
 
+    /* ── Dark dice reveal ───────────────────────────── */
+    #dark-reveal-toast { animation: revealFadeIn 0.4s ease; }
+    @keyframes revealFadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+    .dark-reveal-card {
+      background: rgba(20,60,100,0.55); border: 1px solid rgba(68,170,255,0.45);
+      border-radius: 12px; padding: 10px 14px; margin-bottom: 4px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .dark-reveal-label { font-size: 0.72rem; color: #44aaff; font-weight: bold; white-space: nowrap; }
+    .dark-reveal-dice  { display: flex; gap: 5px; flex-wrap: wrap; }
+    .dark-reveal-face  {
+      width: 28px; height: 28px; border-radius: 6px; font-size: 0.72rem; font-weight: bold;
+      display: flex; align-items: center; justify-content: center;
+      background: #fff; color: #1a1a1a; border: 2px solid rgba(68,170,255,0.6);
+    }
+    .dark-reveal-face.was-dark { background: #44aaff22; color: #44aaff; border-color: #44aaff; }
+
     /* ── Classic Mode play screen ───────────────────── */
     #free-screen {
       display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -633,6 +650,9 @@
 
       <!-- Wild outcome badge (compact reminder during regular rolling) -->
       <div id="wild-outcome-badge" style="display:none; justify-content:center; width:100%"></div>
+
+      <!-- Dark dice reveal toast (shown at end of wild round) -->
+      <div id="dark-reveal-toast" style="display:none; width:100%"></div>
 
       <div class="dice-tray" id="dice-tray"></div>
 
@@ -867,6 +887,7 @@ let wildLockedDieIdx=-1; // index of die locked to '9'
 let wildBlankIdxs=[]; // indices of blank (hidden) dice
 let wildCharge=false; // player has a wild-die charge to use
 let currentWildFace=0; // 1-6 wild die face for current turn
+let wildRevealLog=[]; // {name, darkIdxs, dice} for players who had dark dice this round
 
 // ── Hand logic ────────────────────────────────────────────────────────────────
 function getCounts(arr){const m={};for(const f of arr)m[f]=(m[f]||0)+1;return Object.values(m);}
@@ -1420,6 +1441,10 @@ function cpuBankCurrent(){
 }
 function bankHand(idx,hand,diceArr){
   bankedThisRound.push({idx,hand,dice:diceArr});renderBankedHands();
+  // Record dark dice reveal for wild mode
+  if(gameMode==='wild' && wildBlankIdxs.length){
+    wildRevealLog.push({name:players[idx].name,darkIdxs:[...wildBlankIdxs],dice:diceArr});
+  }
   const next=findNextUnbanked(idx);
   if(next===-1){setTimeout(()=>gameMode==='score'?scoreEndRound():betResolveRound(),600);}
   else{setTimeout(()=>startTurn(next),800);}
@@ -1557,7 +1582,8 @@ function betStartBettingRound(){
   active.forEach(i=>{pState[i].bal-=MIN_ANTE;});
   bTotalPot = MIN_ANTE*active.length;
 
-  bankedThisRound=[];
+  bankedThisRound=[];wildRevealLog=[];
+  document.getElementById('dark-reveal-toast').style.display='none';
   document.getElementById('betting-panel').style.display='none';
   document.getElementById('roll-area').style.display='none';
 
@@ -1766,6 +1792,25 @@ function betStartRollingPhase(){
 
 // ── Bet resolve ───────────────────────────────────────────────────────────────
 function betResolveRound(){
+  // Show dark dice reveal if any player had hidden dice this round
+  if(wildRevealLog.length){
+    const toast=document.getElementById('dark-reveal-toast');
+    toast.innerHTML=wildRevealLog.map(r=>`
+      <div class="dark-reveal-card">
+        <span class="dark-reveal-label">🔍 ${r.name}'s hidden dice:</span>
+        <div class="dark-reveal-dice">
+          ${r.dice.map((f,i)=>`<div class="dark-reveal-face${r.darkIdxs.includes(i)?' was-dark':''}">${f}</div>`).join('')}
+        </div>
+      </div>`).join('');
+    toast.style.display='block';
+    wildRevealLog=[];
+    setTimeout(_betResolveRound, 2200);
+    return;
+  }
+  _betResolveRound();
+}
+function _betResolveRound(){
+  document.getElementById('dark-reveal-toast').style.display='none';
   const maxPts=Math.max(...bankedThisRound.map(b=>handScore(b.hand)));
   const winners=bankedThisRound.filter(b=>handScore(b.hand)===maxPts);
   const share=Math.floor(pot/winners.length);
@@ -1809,7 +1854,7 @@ function rematch(){
 // ── WILD MODE ─────────────────────────────────────────────────────────────────
 function initWildMode(){
   wildDicePenalty=players.map(()=>false);
-  wildLockedDieIdx=-1;wildBlankIdxs=[];wildCharge=false;currentWildFace=0;
+  wildLockedDieIdx=-1;wildBlankIdxs=[];wildCharge=false;currentWildFace=0;wildRevealLog=[];
   betRound=1;pot=0;
   pState=players.map(()=>({bal:START_BAL,eliminated:false}));
   dealerIdx=activePlayers()[0]??0;
@@ -1818,6 +1863,7 @@ function initWildMode(){
   document.getElementById('wild-modal').classList.remove('visible');
   document.getElementById('wild-pick-modal').classList.remove('visible');
   document.getElementById('wild-outcome-badge').style.display='none';
+  document.getElementById('dark-reveal-toast').style.display='none';
   renderScoreboard();updateBelowStrip();
   betStartBettingRound();
 }
