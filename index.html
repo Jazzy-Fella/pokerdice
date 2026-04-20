@@ -2040,6 +2040,21 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
     document.getElementById('betting-panel').style.display='none';
     renderScoreboard();
     setTimeout(()=>{
+      // If only one non-folded player remains, they win uncontested
+      const remaining=activePlayers().filter(i=>!bFolded[i]);
+      if(remaining.length===1){
+        const winner=remaining[0];
+        pState[winner].bal+=pot;
+        flashDelta(winner,pot,true);
+        pot=0;
+        players.forEach((_,i)=>{if(pState[i].bal<MIN_ANTE)pState[i].eliminated=true;});
+        betRound++;
+        renderScoreboard();updateBelowStrip();
+        setBanner(`${players[winner].name} wins — everyone else folded!`,'idle-turn');
+        setStatus('');
+        setTimeout(betStartBettingRound,2200);
+        return;
+      }
       const next=findNextUnbanked(idx);
       if(next===-1){ betResolveRound(); }
       else { startTurn(next); }
