@@ -478,6 +478,25 @@
     .fr-name { font-size:0.85rem; color:#f0e6c8; font-weight:bold; flex:1; }
     .fr-hand { font-size:0.75rem; color:#a8c8a0; text-align:right; }
 
+    /* ── Wild round winner popup ─────────────────── */
+    #wild-round-modal {
+      display:none; position:fixed; inset:0; z-index:160;
+      background:rgba(0,0,0,0.82); align-items:center; justify-content:center;
+    }
+    #wild-round-modal.visible { display:flex; }
+    .wrm-card {
+      background:linear-gradient(160deg,#1a0a2e,#0d0618);
+      border:2px solid rgba(255,215,0,0.5); border-radius:22px;
+      padding:28px 26px; display:flex; flex-direction:column;
+      align-items:center; gap:10px; min-width:280px; max-width:340px;
+      box-shadow:0 8px 40px rgba(255,215,0,0.3);
+    }
+    .wrm-trophy  { font-size:2.4rem; line-height:1; }
+    .wrm-label   { font-size:0.58rem; text-transform:uppercase; letter-spacing:0.18em; color:#aa66ff; }
+    .wrm-winner  { font-size:1.5rem; color:#ffd700; font-weight:bold; text-align:center; line-height:1.2; }
+    .wrm-hand    { font-size:0.88rem; color:#c8dfc8; text-align:center; }
+    .wrm-pot     { font-size:1.1rem; color:#ffd700; font-weight:bold; }
+
     #wild-pick-modal {
       display:none; position:fixed; inset:0; z-index:160;
       background:rgba(0,0,0,0.88); align-items:center; justify-content:center;
@@ -726,6 +745,18 @@
       <button class="btn btn-roll" style="flex:1" onclick="freePlayAgain()">Play Again</button>
       <button class="btn btn-mode" style="flex:0 0 auto;padding:12px 18px" onclick="freeQuit()">✕ Quit</button>
     </div>
+  </div>
+</div>
+
+<!-- Wild mode round winner popup -->
+<div id="wild-round-modal">
+  <div class="wrm-card">
+    <div class="wrm-trophy">🏆</div>
+    <div class="wrm-label" id="wrm-label">Round Winner</div>
+    <div class="wrm-winner" id="wrm-winner"></div>
+    <div class="wrm-hand"   id="wrm-hand"></div>
+    <div class="wrm-pot"    id="wrm-pot"></div>
+    <button class="btn btn-roll" style="margin-top:6px;width:100%" onclick="wildRoundModalContinue()">Next Round →</button>
   </div>
 </div>
 
@@ -1421,6 +1452,7 @@ function goToModeSelect(){
   clearShake();
   document.activeElement?.blur();
   document.getElementById('overlay').classList.remove('visible');
+  document.getElementById('wild-round-modal').classList.remove('visible');
   document.getElementById('game-screen').style.display='none';
   document.getElementById('game-change-mode-btn').style.display='none';
   document.getElementById('player-setup').style.display='none';
@@ -1707,9 +1739,18 @@ function processNextBetter(){
     betRound++;
     renderScoreboard();updateBelowStrip();
     const wName=players[winner].name;
-    setBanner(`${wName} wins — everyone else folded!`,'idle-turn');
     document.getElementById('betting-panel').style.display='none';
-    setTimeout(betStartBettingRound,2200);
+    if(gameMode==='wild'){
+      document.getElementById('wrm-label').textContent='Everyone Folded!';
+      document.getElementById('wrm-winner').textContent=wName;
+      document.getElementById('wrm-hand').textContent='Last player standing';
+      document.getElementById('wrm-pot').textContent=`Wins ${fmt(bTotalPot||pot)}`;
+      document.getElementById('wild-round-modal').classList.add('visible');
+      setBanner('','idle-turn');
+    } else {
+      setBanner(`${wName} wins — everyone else folded!`,'idle-turn');
+      setTimeout(betStartBettingRound,2200);
+    }
     return;
   }
 
@@ -1907,16 +1948,18 @@ function betResolveRound(){
   players.forEach((_,i)=>{if(pState[i].bal<MIN_ANTE)pState[i].eliminated=true;});
   betRound++;renderScoreboard();updateBelowStrip();
 
-  // In Wild Mode show a round winner summary before next round
+  // In Wild Mode show a round winner popup before next round
   if(gameMode==='wild'){
     const winnerNames=winners.map(w=>players[w.idx].name);
     const handName=winners[0].hand.name;
-    const msg=winners.length>1
-      ? `🏆 Tie — ${winnerNames.join(' & ')} split ${fmt(totalPot)} with ${handName}`
-      : `🏆 ${winnerNames[0]} wins ${fmt(totalPot)} with ${handName}!`;
-    setBanner(msg,'human-turn',false);
+    const isTie=winners.length>1;
+    document.getElementById('wrm-label').textContent=isTie?'It\'s a Tie!':'Round Winner';
+    document.getElementById('wrm-winner').textContent=isTie?winnerNames.join(' & '):winnerNames[0];
+    document.getElementById('wrm-hand').textContent=handName;
+    document.getElementById('wrm-pot').textContent=isTie?`Split ${fmt(totalPot)}`:`Wins ${fmt(totalPot)}`;
+    document.getElementById('wild-round-modal').classList.add('visible');
+    setBanner('','idle-turn');
     setStatus('');
-    setTimeout(betStartBettingRound,2400);
   } else {
     setTimeout(betStartBettingRound,1800);
   }
@@ -1954,6 +1997,7 @@ function initWildMode(){
   document.getElementById('roll-area').style.display='none';
   document.getElementById('wild-modal').classList.remove('visible');
   document.getElementById('wild-pick-modal').classList.remove('visible');
+  document.getElementById('wild-round-modal').classList.remove('visible');
   document.getElementById('wild-outcome-badge').style.display='none';
   renderScoreboard();updateBelowStrip();
   betStartBettingRound();
@@ -1984,6 +2028,10 @@ function wildShowPanel(idx,isCpu){
 function wildDismissModal(){
   document.getElementById('wild-modal').classList.remove('visible');
   wildApplyOutcomeAfterModal(currentWildFace,currentPlayerIdx,_wildPendingIsCpu);
+}
+function wildRoundModalContinue(){
+  document.getElementById('wild-round-modal').classList.remove('visible');
+  betStartBettingRound();
 }
 let _wildPendingIsCpu=false;
 
@@ -2050,9 +2098,12 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
         players.forEach((_,i)=>{if(pState[i].bal<MIN_ANTE)pState[i].eliminated=true;});
         betRound++;
         renderScoreboard();updateBelowStrip();
-        setBanner(`${players[winner].name} wins — everyone else folded!`,'idle-turn');
-        setStatus('');
-        setTimeout(betStartBettingRound,2200);
+        document.getElementById('wrm-label').textContent='Everyone Folded!';
+        document.getElementById('wrm-winner').textContent=players[winner].name;
+        document.getElementById('wrm-hand').textContent='Last player standing';
+        document.getElementById('wrm-pot').textContent=`Wins ${fmt(pot)}`;
+        document.getElementById('wild-round-modal').classList.add('visible');
+        setBanner('','idle-turn');setStatus('');
         return;
       }
       const next=findNextUnbanked(idx);
