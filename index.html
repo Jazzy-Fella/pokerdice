@@ -164,7 +164,8 @@
     .turn-banner {
       width: 100%; max-width: 580px; text-align: center;
       font-size: 0.92rem; font-weight: bold; letter-spacing: 0.06em;
-      padding: 6px 0; margin-bottom: 6px; border-radius: 8px; min-height: 30px;
+      padding: 6px 0; margin-bottom: 6px; border-radius: 8px;
+      min-height: 3.4rem; /* pre-allocates 2 wrapped lines so height never changes */
       display: flex; align-items: center; justify-content: center;
       transition: background 0.3s, color 0.3s;
     }
@@ -659,7 +660,7 @@
       <div class="banked-hands" id="banked-hands" style="display:none"></div>
 
       <!-- Wild outcome badge (compact reminder during regular rolling) -->
-      <div id="wild-outcome-badge" style="display:none; justify-content:center; width:100%"></div>
+      <div id="wild-outcome-badge" style="visibility:hidden; display:flex; justify-content:center; width:100%; min-height:1.6rem; align-items:center;"></div>
 
 
       <div class="dice-tray" id="dice-tray"></div>
@@ -1469,7 +1470,7 @@ function startTurn(idx){
   setHandDisplay('',0,isCpu);renderRollsLeft();
   if(gameMode==='wild'){
     wildBlankIdxs=[];wildCharge=false;currentWildFace=0;
-    document.getElementById('wild-outcome-badge').style.display='none';
+    document.getElementById('wild-outcome-badge').style.visibility='hidden';
     document.getElementById('wild-pick-modal').classList.remove('visible');
     document.getElementById('wild-modal').classList.remove('visible');
     wildShowPanel(idx,isCpu);
@@ -1964,7 +1965,7 @@ function initWildMode(){
   document.getElementById('roll-area').style.display='none';
   document.getElementById('wild-modal').classList.remove('visible');
   document.getElementById('wild-pick-modal').classList.remove('visible');
-  document.getElementById('wild-outcome-badge').style.display='none';
+  document.getElementById('wild-outcome-badge').style.visibility='hidden';
   renderScoreboard();updateBelowStrip();
   betStartBettingRound();
 }
@@ -2060,7 +2061,7 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
   // Show compact outcome badge
   const badge=document.getElementById('wild-outcome-badge');
   badge.innerHTML=`<span class="wild-badge" style="background:${w.color}22;border:1px solid ${w.color}55;color:${w.color}">${w.title}</span>`;
-  badge.style.display='flex';
+  badge.style.visibility='visible';
 
   // Re-render tray with wild opts applied
   renderTray('dice-tray',dice,held,{isCpu,...wildRenderOpts()});
