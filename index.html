@@ -1196,7 +1196,7 @@ function renderScoreboard(){
       ${isDealer?'<div class="dealer-btn">D</div>':''}
       ${isFolded?'<div class="ps-folded-badge">Folded</div>':''}
       <div class="ps-value" style="color:${PLAYER_COLORS[i]};font-size:${valSize}" id="ps-val-${i}">${val}</div>
-      ${showBetContrib?`<div class="ps-bet-contrib">in: ${fmt(bContrib[i])}</div>`:''}
+      ${showBetContrib?`<div class="ps-bet-contrib">bet: ${fmt(bContrib[i])}</div>`:''}
       <div class="ps-hand" id="ps-hand-${i}">${shortHand(banked)}</div>
       <div class="ps-delta" id="ps-delta-${i}">&nbsp;</div>`;
     sb.appendChild(col);
