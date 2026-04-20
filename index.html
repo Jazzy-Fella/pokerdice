@@ -1874,10 +1874,24 @@ function betResolveRound(){
     flashDelta(i,gain-bContrib[i],true);
   });
 
+  const totalPot=share*winners.length+rem;
   pot=0;
   players.forEach((_,i)=>{if(pState[i].bal<MIN_ANTE)pState[i].eliminated=true;});
   betRound++;renderScoreboard();updateBelowStrip();
-  setTimeout(betStartBettingRound,1800);
+
+  // In Wild Mode show a round winner summary before next round
+  if(gameMode==='wild'){
+    const winnerNames=winners.map(w=>players[w.idx].isHuman?'You':players[w.idx].name);
+    const handName=winners[0].hand.name;
+    const msg=winners.length>1
+      ? `🏆 Tie — ${winnerNames.join(' & ')} split ${fmt(totalPot)} with ${handName}`
+      : `🏆 ${winnerNames[0]} wins ${fmt(totalPot)} with ${handName}!`;
+    setBanner(msg,'human-turn',false);
+    setStatus('');
+    setTimeout(betStartBettingRound,2400);
+  } else {
+    setTimeout(betStartBettingRound,1800);
+  }
 }
 
 function betShowGameOver(){
