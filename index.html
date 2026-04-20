@@ -1740,7 +1740,7 @@ function processNextBetter(){
     renderScoreboard();updateBelowStrip();
     const wName=players[winner].name;
     document.getElementById('betting-panel').style.display='none';
-    if(gameMode==='wild'){
+    if(gameMode==='wild'||gameMode==='bet'){
       document.getElementById('wrm-label').textContent='Everyone Folded!';
       document.getElementById('wrm-winner').textContent=wName;
       document.getElementById('wrm-hand').textContent='Last player standing';
@@ -1948,8 +1948,8 @@ function betResolveRound(){
   players.forEach((_,i)=>{if(pState[i].bal<MIN_ANTE)pState[i].eliminated=true;});
   betRound++;renderScoreboard();updateBelowStrip();
 
-  // In Wild Mode show a round winner popup before next round
-  if(gameMode==='wild'){
+  // Show round winner popup (wild + bet modes)
+  if(gameMode==='wild'||gameMode==='bet'){
     const winnerNames=winners.map(w=>players[w.idx].name);
     const handName=winners[0].hand.name;
     const isTie=winners.length>1;
