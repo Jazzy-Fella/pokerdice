@@ -431,12 +431,12 @@
     /* ── Score mode hand reference ──────────────────── */
     .shr-grid {
       background: rgba(0,0,0,0.28); border: 1px solid rgba(255,215,0,0.15);
-      border-radius: 10px; padding: 6px 10px;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px;
+      border-radius: 8px; padding: 4px 8px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1px 6px;
     }
-    .shr-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 6px; border-radius: 5px; }
-    .shr-name { font-size: 0.68rem; color: #c8d8c0; }
-    .shr-pts  { font-size: 0.68rem; color: #ffd700; font-weight: bold; margin-left: 6px; white-space: nowrap; }
+    .shr-row { display: flex; justify-content: space-between; align-items: center; padding: 0px 4px; border-radius: 4px; }
+    .shr-name { font-size: 0.60rem; color: #c8d8c0; }
+    .shr-pts  { font-size: 0.60rem; color: #ffd700; font-weight: bold; margin-left: 4px; white-space: nowrap; }
 
     /* ── Classic Mode play screen ───────────────────── */
     #free-screen {
@@ -444,6 +444,7 @@
       flex-direction: column; align-items: center;
       width: calc(100% - 32px); max-width: 580px;
     }
+
     #free-change-mode-btn, #game-change-mode-btn {
       display: none; position: fixed;
       bottom: calc(env(safe-area-inset-bottom) + 14px);
@@ -622,7 +623,7 @@
 </div>
 
 <!-- ── GAME SCREEN ─────────────────────────────────────────────────── -->
-<div id="game-screen" style="display:none; flex-direction:column; align-items:center; width:100%; max-width:580px; padding-bottom: calc(env(safe-area-inset-bottom) + 70px);">
+<div id="game-screen" style="display:none; flex-direction:column; align-items:center; width:100%; max-width:580px;">
 
   <div class="scoreboard" id="scoreboard"></div>
   <div class="below-strip" id="below-strip"></div>
@@ -702,7 +703,7 @@
       </div>
 
       <!-- Hand score reference — score mode only -->
-      <div id="score-hand-ref" style="display:none; width:100%; margin-top:4px;">
+      <div id="score-hand-ref" style="display:none; width:100%; margin-top:2px;">
         <div class="shr-grid">
           <div class="shr-row"><span class="shr-name">Five of a Kind</span><span class="shr-pts">200 pts</span></div>
           <div class="shr-row"><span class="shr-name">Straight</span><span class="shr-pts">100 pts</span></div>
