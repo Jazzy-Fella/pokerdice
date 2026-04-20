@@ -1580,6 +1580,7 @@ function bankHand(idx,hand,diceArr){
   // In score mode, apply points immediately so the scoreboard updates live
   if(gameMode==='score'){
     pState[idx].pts+=hand.pts;
+    pState[idx].handQ=(pState[idx].handQ||0)+(hand.tiebreak||0); // accumulate hand quality for tie-breaking
     flashDelta(idx,hand.pts,false);
     renderScoreboard();
   }
@@ -1669,7 +1670,7 @@ function _revealDarkDice(cb){
 
 // ── SCORE MODE ────────────────────────────────────────────────────────────────
 function initScoreMode(){
-  currentRoundNum=1;pState=players.map(()=>({pts:0}));bankedThisRound=[];
+  currentRoundNum=1;pState=players.map(()=>({pts:0,handQ:0}));bankedThisRound=[];
   document.getElementById('betting-panel').style.display='none';
   document.getElementById('roll-area').style.display='flex';
   document.getElementById('score-hand-ref').style.display='block';
@@ -1683,7 +1684,13 @@ function scoreEndRound(){
 }
 function scoreShowGameOver(){
   const maxPts=Math.max(...pState.map(s=>s.pts));
-  const winners=pState.map((s,i)=>i).filter(i=>pState[i].pts===maxPts);
+  let tied=pState.map((s,i)=>i).filter(i=>pState[i].pts===maxPts);
+  // Break equal-pts ties by cumulative hand quality (e.g. AA KK > QQ JJ at same 20-pt Two Pair)
+  if(tied.length>1){
+    const maxQ=Math.max(...tied.map(i=>pState[i].handQ||0));
+    tied=tied.filter(i=>(pState[i].handQ||0)===maxQ);
+  }
+  const winners=tied;
   document.getElementById('final-scores').innerHTML=players.map((p,i)=>{
     const isWinner=winners.length===1&&winners[0]===i;
     return `<div class="fsc${isWinner?' winner-col':''}"><div class="fsc-name" style="color:${PLAYER_COLORS[i]}">${p.name}</div><div class="fsc-main" style="color:${PLAYER_COLORS[i]}">${pState[i].pts}</div><div class="fsc-sub">pts</div></div>`;
@@ -1997,11 +2004,12 @@ function betResolveRound(){
   // Show round winner popup (wild + bet modes)
   if(gameMode==='wild'||gameMode==='bet'){
     const winnerNames=winners.map(w=>players[w.idx].name);
-    const handName=winners[0].hand.name;
+    const winHand=winners[0].hand;
+    const handDisplay=winHand.kicker?`${winHand.name} · ${winHand.kicker}`:winHand.name;
     const isTie=winners.length>1;
     document.getElementById('wrm-label').textContent=isTie?'It\'s a Tie!':'Round Winner';
     document.getElementById('wrm-winner').textContent=isTie?winnerNames.join(' & '):winnerNames[0];
-    document.getElementById('wrm-hand').textContent=handName;
+    document.getElementById('wrm-hand').textContent=handDisplay;
     document.getElementById('wrm-pot').textContent=isTie?`Split ${fmt(totalPot)}`:`Wins ${fmt(totalPot)}`;
     document.getElementById('wild-round-modal').classList.add('visible');
     setBanner('','idle-turn');
