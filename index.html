@@ -1502,7 +1502,11 @@ function startTurn(idx){
     document.getElementById('wild-outcome-badge').style.display='none';
     document.getElementById('wild-pick-modal').classList.remove('visible');
     document.getElementById('wild-modal').classList.remove('visible');
-    wildShowPanel(idx,isCpu);
+    // Brief pause so the scoreboard highlight + banner is visible before the modal opens
+    const turnLabel=isCpu?`${p.name}'s Turn`:`${p.name}'s Turn`;
+    setBanner(turnLabel,isCpu?'cpu-turn':'human-turn');
+    setStatus('');
+    setTimeout(()=>wildShowPanel(idx,isCpu),750);
     return;
   }
   if(isCpu){
