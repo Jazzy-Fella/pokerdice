@@ -1566,7 +1566,7 @@ function cpuUseWildCharge(){
 }
 function cpuBankCurrent(){
   const hand=evalHand(dice);
-  setStatus(`${players[currentPlayerIdx].name}: ${hand.name} (${hand.pts} pts)`);
+  setStatus(`${players[currentPlayerIdx].name}: ${hand.name}`);
   setBanner('','idle-turn');
   if(wildBlankIdxs.length){
     setTimeout(()=>_revealDarkDice(()=>bankHand(currentPlayerIdx,hand,[...dice])),600);
