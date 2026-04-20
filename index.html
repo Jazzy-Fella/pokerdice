@@ -825,7 +825,9 @@ const FACE_SUIT_COLOR = {'9':'#111','10':'#c0392b','J':'#111','Q':'#c0392b','K':
 const PLAYER_COLORS = ['#ffd700','#cc88ff','#44ddff','#ff9944'];
 const PLAYER_BG     = ['rgba(255,215,0,0.18)','rgba(180,100,220,0.18)','rgba(68,221,255,0.18)','rgba(255,153,68,0.18)'];
 const PLAYER_GLOW   = ['rgba(255,215,0,0.5)','rgba(180,100,220,0.5)','rgba(68,221,255,0.5)','rgba(255,153,68,0.5)'];
-const DEFAULT_NAMES = ['You','Computer','Player 3','Player 4'];
+const AI_NAMES = ['James','Emma','Oliver','Sophia','Harry','Isla','Charlie','Amelia','Jack','Grace','Liam','Chloe','Noah','Lucy','Leo','Poppy','Freddie','Daisy','Alfie','Ruby'];
+function randomAiName(exclude=[]){ const pool=AI_NAMES.filter(n=>!exclude.includes(n)); return pool[Math.floor(Math.random()*pool.length)]; }
+const DEFAULT_NAMES = ['You','AI','AI','AI'];
 
 const TOTAL_ROUNDS = 5;
 const MAX_ROLLS    = 3;
@@ -848,8 +850,8 @@ const HANDS = [
 // ── Setup state ───────────────────────────────────────────────────────────────
 let gameMode = null;
 let setupPlayers = [
-  {name:'You',      isHuman:true},
-  {name:'Computer', isHuman:false},
+  {name:'You',           isHuman:true},
+  {name:randomAiName(['You']), isHuman:false},
 ];
 
 // ── Game state ────────────────────────────────────────────────────────────────
@@ -1349,10 +1351,18 @@ function renderSetupRows(){
     const input=document.createElement('input');input.className='player-name-input';input.type='text';input.value=p.name;input.maxLength=12;
     input.oninput=e=>{setupPlayers[i].name=e.target.value||DEFAULT_NAMES[i];};
     const toggle=document.createElement('div');toggle.className='type-toggle';
-    ['Human','CPU'].forEach(t=>{
+    ['Human','AI'].forEach(t=>{
       const btn=document.createElement('button');
       btn.className='type-btn'+((t==='Human')===p.isHuman?' active':'');btn.textContent=t;
-      btn.onclick=()=>{setupPlayers[i].isHuman=(t==='Human');renderSetupRows();};
+      btn.onclick=()=>{
+        const becomingAi=(t==='AI');
+        if(becomingAi&&setupPlayers[i].isHuman){
+          const taken=setupPlayers.filter((_,j)=>j!==i).map(p=>p.name);
+          setupPlayers[i].name=randomAiName(taken);
+        }
+        setupPlayers[i].isHuman=(t==='Human');
+        renderSetupRows();
+      };
       toggle.appendChild(btn);
     });
     row.appendChild(badge);row.appendChild(input);row.appendChild(toggle);container.appendChild(row);
@@ -1362,7 +1372,8 @@ function renderSetupRows(){
 }
 function addPlayer(){
   if(setupPlayers.length>=4)return;
-  setupPlayers.push({name:DEFAULT_NAMES[setupPlayers.length],isHuman:false});renderSetupRows();
+  const taken=setupPlayers.map(p=>p.name);
+  setupPlayers.push({name:randomAiName(taken),isHuman:false});renderSetupRows();
 }
 function removePlayer(){if(setupPlayers.length<=2)return;setupPlayers.pop();renderSetupRows();}
 function startGame(){
