@@ -378,6 +378,10 @@
 
     /* ── Classic mode scoreboard (no ps-value row) ── */
     #free-scoreboard .ps-hand { min-height: unset; height: 2.8em; overflow: hidden; }
+    #free-scoreboard { border-radius: 14px; border-bottom: 1px solid rgba(255,215,0,0.25); margin-bottom: 6px; }
+    #free-scoreboard .ps:first-child { border-radius: 14px 0 0 14px; }
+    #free-scoreboard .ps:last-child  { border-radius: 0 14px 14px 0; }
+    #free-scoreboard .ps:only-child  { border-radius: 14px; }
 
     /* ── Folded badge ──────────────────────────── */
     .ps-folded-badge {
