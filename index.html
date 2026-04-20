@@ -842,7 +842,7 @@ const PLAYER_BG     = ['rgba(255,215,0,0.18)','rgba(180,100,220,0.18)','rgba(68,
 const PLAYER_GLOW   = ['rgba(255,215,0,0.5)','rgba(180,100,220,0.5)','rgba(68,221,255,0.5)','rgba(255,153,68,0.5)'];
 const AI_NAMES = ['James','Emma','Oliver','Sophia','Harry','Isla','Charlie','Amelia','Jack','Grace','Liam','Chloe','Noah','Lucy','Leo','Poppy','Freddie','Daisy','Alfie','Ruby'];
 function randomAiName(exclude=[]){ const pool=AI_NAMES.filter(n=>!exclude.includes(n)); return pool[Math.floor(Math.random()*pool.length)]; }
-const DEFAULT_NAMES = ['Player 1','AI','AI','AI'];
+const DEFAULT_NAMES = ['Player 1','Player 2','Player 3','Player 4'];
 
 const TOTAL_ROUNDS = 5;
 const MAX_ROLLS    = 3;
@@ -1399,6 +1399,8 @@ function renderSetupRows(){
         if(becomingAi&&setupPlayers[i].isHuman){
           const taken=setupPlayers.filter((_,j)=>j!==i).map(p=>p.name);
           setupPlayers[i].name=randomAiName(taken);
+        } else if(!becomingAi&&!setupPlayers[i].isHuman){
+          setupPlayers[i].name=`Player ${i+1}`;
         }
         setupPlayers[i].isHuman=(t==='Human');
         renderSetupRows();
