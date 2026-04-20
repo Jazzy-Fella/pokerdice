@@ -49,20 +49,23 @@
       transition: border-color 0.2s, background 0.2s, transform 0.15s;
       touch-action: manipulation;
     }
-    .mode-card:hover { border-color: rgba(255,215,0,0.6); background: rgba(255,215,0,0.08); transform: translateX(3px); }
     .mode-card .mode-icon { font-size: 2rem; flex-shrink: 0; line-height: 1; width: 2.4rem; text-align: center; }
     .mode-card .mode-text { display: flex; flex-direction: column; align-items: flex-start; flex: 1; min-width: 0; }
     .mode-card h2 { font-size: 1.05rem; color: #ffd700; margin: 0 0 2px; }
     .mode-card p  { font-size: 0.68rem; color: #a8c8a0; line-height: 1.4; margin: 0; }
     .mode-card.bet-card { border-color: rgba(180,100,220,0.3); }
-    .mode-card.bet-card:hover { border-color: rgba(180,100,220,0.7); background: rgba(180,100,220,0.08); }
     .mode-card.bet-card h2 { color: #cc88ff; }
     .mode-card.wild-card { border-color: rgba(255,140,40,0.3); }
-    .mode-card.wild-card:hover { border-color: rgba(255,140,40,0.7); background: rgba(255,140,40,0.08); }
     .mode-card.wild-card h2 { color: #ff8c28; }
     .mode-card.free-card { border-color: rgba(68,221,255,0.3); }
-    .mode-card.free-card:hover { border-color: rgba(68,221,255,0.7); background: rgba(68,221,255,0.08); }
     .mode-card.free-card h2 { color: #44ddff; }
+    /* Hover effects only on real pointer devices — prevents iOS sticky hover */
+    @media (hover: hover) and (pointer: fine) {
+      .mode-card:hover           { border-color: rgba(255,215,0,0.6);    background: rgba(255,215,0,0.08);    transform: translateX(3px); }
+      .mode-card.bet-card:hover  { border-color: rgba(180,100,220,0.7);  background: rgba(180,100,220,0.08); }
+      .mode-card.wild-card:hover { border-color: rgba(255,140,40,0.7);   background: rgba(255,140,40,0.08);  }
+      .mode-card.free-card:hover { border-color: rgba(68,221,255,0.7);   background: rgba(68,221,255,0.08);  }
+    }
 
     /* ── Free mode hand display ──────────────────── */
     .free-hand-display {
@@ -670,7 +673,7 @@
           <div class="shr-row"><span class="shr-name">Full House</span><span class="shr-pts">50 pts</span></div>
           <div class="shr-row"><span class="shr-name">Three of a Kind</span><span class="shr-pts">30 pts</span></div>
           <div class="shr-row"><span class="shr-name">Two Pair</span><span class="shr-pts">20 pts</span></div>
-          <div class="shr-row"><span class="shr-name">One Pair</span><span class="shr-pts">10 pts</span></div>
+          <div class="shr-row" style="grid-column:1/-1;justify-content:center;gap:8px;"><span class="shr-name">One Pair</span><span class="shr-pts">10 pts</span></div>
         </div>
       </div>
     </div>
@@ -1382,11 +1385,6 @@ function goToModeSelect(){
   document.getElementById('score-hand-ref').style.display='none';
   document.getElementById('mode-select').style.display='flex';
   document.getElementById('shake-toggle-btn').style.display='block';
-  // Briefly kill pointer-events on mode cards so the lingering iOS touch
-  // can't trigger a sticky :hover on whichever card is under the finger
-  const cards=document.querySelectorAll('.mode-card');
-  cards.forEach(c=>c.style.pointerEvents='none');
-  setTimeout(()=>cards.forEach(c=>c.style.pointerEvents=''),400);
 }
 
 // ── Shared turn engine ────────────────────────────────────────────────────────
