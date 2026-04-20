@@ -407,6 +407,16 @@
     .wild-badge { font-size:0.68rem; padding:3px 12px; border-radius:20px; font-weight:bold; }
 
 
+    /* ── Score mode hand reference ──────────────────── */
+    .shr-grid {
+      background: rgba(0,0,0,0.28); border: 1px solid rgba(255,215,0,0.15);
+      border-radius: 10px; padding: 6px 10px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px;
+    }
+    .shr-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 6px; border-radius: 5px; }
+    .shr-name { font-size: 0.68rem; color: #c8d8c0; }
+    .shr-pts  { font-size: 0.68rem; color: #ffd700; font-weight: bold; margin-left: 6px; white-space: nowrap; }
+
     /* ── Classic Mode play screen ───────────────────── */
     #free-screen {
       display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -649,6 +659,19 @@
         <button class="btn btn-roll" id="btn-roll" onclick="playerShakeRoll()">Shake &amp; Roll</button>
         <button class="btn btn-bank" id="btn-bank" onclick="playerBank()" disabled>Bank Hand</button>
         <div class="status-text" id="status-text">Click Roll to start</div>
+      </div>
+
+      <!-- Hand score reference — score mode only -->
+      <div id="score-hand-ref" style="display:none; width:100%; margin-top:4px;">
+        <div class="shr-grid">
+          <div class="shr-row"><span class="shr-name">Five of a Kind</span><span class="shr-pts">200 pts</span></div>
+          <div class="shr-row"><span class="shr-name">Straight</span><span class="shr-pts">100 pts</span></div>
+          <div class="shr-row"><span class="shr-name">Four of a Kind</span><span class="shr-pts">75 pts</span></div>
+          <div class="shr-row"><span class="shr-name">Full House</span><span class="shr-pts">50 pts</span></div>
+          <div class="shr-row"><span class="shr-name">Three of a Kind</span><span class="shr-pts">30 pts</span></div>
+          <div class="shr-row"><span class="shr-name">Two Pair</span><span class="shr-pts">20 pts</span></div>
+          <div class="shr-row"><span class="shr-name">One Pair</span><span class="shr-pts">10 pts</span></div>
+        </div>
       </div>
     </div>
 
@@ -1356,6 +1379,7 @@ function goToModeSelect(){
   document.getElementById('player-setup').style.display='none';
   document.getElementById('free-screen').style.display='none';
   document.getElementById('free-change-mode-btn').style.display='none';
+  document.getElementById('score-hand-ref').style.display='none';
   document.getElementById('mode-select').style.display='flex';
   document.getElementById('shake-toggle-btn').style.display='block';
   // Briefly kill pointer-events on mode cards so the lingering iOS touch
@@ -1458,6 +1482,12 @@ function cpuBankCurrent(){
 }
 function bankHand(idx,hand,diceArr){
   bankedThisRound.push({idx,hand,dice:diceArr});renderBankedHands();
+  // In score mode, apply points immediately so the scoreboard updates live
+  if(gameMode==='score'){
+    pState[idx].pts+=hand.pts;
+    flashDelta(idx,hand.pts,false);
+    renderScoreboard();
+  }
   const next=findNextUnbanked(idx);
   if(next===-1){setTimeout(()=>gameMode==='score'?scoreEndRound():betResolveRound(),600);}
   else{setTimeout(()=>startTurn(next),800);}
@@ -1547,10 +1577,11 @@ function initScoreMode(){
   currentRoundNum=1;pState=players.map(()=>({pts:0}));bankedThisRound=[];
   document.getElementById('betting-panel').style.display='none';
   document.getElementById('roll-area').style.display='flex';
+  document.getElementById('score-hand-ref').style.display='block';
   renderScoreboard();updateBelowStrip();startTurn(0);
 }
 function scoreEndRound(){
-  bankedThisRound.forEach(b=>{pState[b.idx].pts+=b.hand.pts;flashDelta(b.idx,b.hand.pts,false);});
+  // Points already applied live in bankHand — just advance the round
   renderScoreboard();currentRoundNum++;bankedThisRound=[];
   if(currentRoundNum>TOTAL_ROUNDS){setTimeout(scoreShowGameOver,1600);}
   else{setTimeout(()=>{startTurn(0);},1600);}
