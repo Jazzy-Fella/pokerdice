@@ -19,7 +19,7 @@
   <meta name="apple-mobile-web-app-title" content="Poker Dice">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
     html { overscroll-behavior: none; background: #081f10; }
     body {
       height: calc(100dvh + env(safe-area-inset-bottom)); overflow: hidden; position: relative;
@@ -1358,6 +1358,11 @@ function goToModeSelect(){
   document.getElementById('free-change-mode-btn').style.display='none';
   document.getElementById('mode-select').style.display='flex';
   document.getElementById('shake-toggle-btn').style.display='block';
+  // Briefly kill pointer-events on mode cards so the lingering iOS touch
+  // can't trigger a sticky :hover on whichever card is under the finger
+  const cards=document.querySelectorAll('.mode-card');
+  cards.forEach(c=>c.style.pointerEvents='none');
+  setTimeout(()=>cards.forEach(c=>c.style.pointerEvents=''),400);
 }
 
 // ── Shared turn engine ────────────────────────────────────────────────────────
