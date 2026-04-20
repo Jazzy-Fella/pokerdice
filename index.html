@@ -1699,19 +1699,32 @@ function betStartBettingRound(){
 
   // Reset round state
   currentTurn='bet';
-  bContrib   = players.map((_,i)=>active.includes(i)?MIN_ANTE:0);
   bFolded    = players.map((_,i)=>!active.includes(i));
-  bStatus    = players.map((_,i)=>active.includes(i)?'waiting':'skip');
   bCurrent   = MIN_ANTE;
   bRaiseAmt  = MIN_RAISE;
   bActingIdx = -1;
-  // Queue starts from dealer
-  const dealerPos=active.indexOf(dealerIdx);
-  bQueue=active.map((_,k)=>active[(dealerPos+k)%active.length]);
 
-  // Deduct antes from all active players
-  active.forEach(i=>{pState[i].bal-=MIN_ANTE;});
-  bTotalPot = MIN_ANTE*active.length;
+  // Deduct antes — short stacks (≤ MIN_ANTE) go all-in with their remaining balance
+  bContrib = players.map(()=>0);
+  active.forEach(i=>{
+    const ante=Math.min(pState[i].bal,MIN_ANTE);
+    bContrib[i]=ante;
+    pState[i].bal-=ante;
+  });
+  bTotalPot = bContrib.reduce((s,v)=>s+v,0);
+
+  // Mark all-in players (bal=0 after ante) — they skip the betting queue
+  bStatus = players.map((_,i)=>{
+    if(!active.includes(i))return 'skip';
+    if(pState[i].bal===0)return 'allin';
+    return 'waiting';
+  });
+
+  // Queue starts from dealer; all-in players sit out betting (they still roll)
+  const dealerPos=active.indexOf(dealerIdx);
+  bQueue=active
+    .map((_,k)=>active[(dealerPos+k)%active.length])
+    .filter(i=>pState[i].bal>0);
 
   bankedThisRound=[];
   if(gameMode==='wild') wildDiceCount=players.map(()=>5); // reset dice counts each round
@@ -1735,7 +1748,7 @@ function processNextBetter(){
     flashDelta(winner,bTotalPot-bContrib[winner],true);
     players.forEach((_,i)=>{if(bContrib[i]>0&&i!==winner)flashDelta(i,-bContrib[i],true);});
     bTotalPot=0;
-    players.forEach((_,i)=>{if(pState[i].bal<MIN_ANTE)pState[i].eliminated=true;});
+    players.forEach((_,i)=>{if(pState[i].bal<=0)pState[i].eliminated=true;});
     betRound++;
     renderScoreboard();updateBelowStrip();
     const wName=players[winner].name;
@@ -1781,6 +1794,7 @@ function renderBettingStatus(){
     if(!s||s==='skip')return '';
     let cls,text;
     if(s==='fold')      {cls='bsb bsb-fold'; text=`${p.name} folded`;}
+    else if(s==='allin'){cls='bsb bsb-raise';text=`${p.name} all in (${fmt(bContrib[i])})`;}
     else if(s==='raise'){cls='bsb bsb-raise';text=`${p.name} raised to ${fmt(bContrib[i])}`;}
     else if(s==='call') {cls='bsb bsb-act';  text=`${p.name} called`;}
     else if(s==='check'){cls='bsb bsb-act';  text=`${p.name} checked`;}
@@ -1945,7 +1959,7 @@ function betResolveRound(){
 
   const totalPot=share*winners.length+rem;
   pot=0;
-  players.forEach((_,i)=>{if(pState[i].bal<MIN_ANTE)pState[i].eliminated=true;});
+  players.forEach((_,i)=>{if(pState[i].bal<=0)pState[i].eliminated=true;});
   betRound++;renderScoreboard();updateBelowStrip();
 
   // Show round winner popup (wild + bet modes)
@@ -2095,7 +2109,7 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
         pState[winner].bal+=pot;
         flashDelta(winner,pot,true);
         pot=0;
-        players.forEach((_,i)=>{if(pState[i].bal<MIN_ANTE)pState[i].eliminated=true;});
+        players.forEach((_,i)=>{if(pState[i].bal<=0)pState[i].eliminated=true;});
         betRound++;
         renderScoreboard();updateBelowStrip();
         document.getElementById('wrm-label').textContent='Everyone Folded!';
