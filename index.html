@@ -1948,7 +1948,7 @@ function wildShowPanel(idx,isCpu){
     setBanner(`${p.name}'s Turn`,'cpu-turn');
     setTimeout(()=>rollWildDie(true),CPU_THINK);
   } else {
-    const label=p.name==='You'?'Your Turn':'${p.name}\'s Turn';
+    const label=p.name==='You'?'Your Turn':`${p.name}'s Turn`;
     setBanner(label,'human-turn');
   }
 }
