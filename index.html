@@ -1412,9 +1412,34 @@ function cpuDoRoll(){
     held=cpuDecideHold(dice,rollsLeft);renderTray('dice-tray',dice,held,{isCpu:true});
     const h=evalHand(dice);setHandDisplay(h.name,h.pts,true);renderRollsLeft();
     const hc=held.filter(Boolean).length;
-    if(rollsLeft===0||hc===5||h.pts>=75){setStatus(`${p.name} kept: ${h.name}`);setTimeout(cpuBankCurrent,CPU_THINK);}
-    else{setStatus(`${p.name} holds ${hc} ${hc===1?'die':'dice'} (${h.name})…`);setTimeout(cpuDoRoll,CPU_ROLL_GAP);}
+    if(wildCharge){
+      setTimeout(cpuUseWildCharge,CPU_THINK);
+    } else if(rollsLeft===0||hc===5||h.pts>=75){
+      setStatus(`${p.name} kept: ${h.name}`);setTimeout(cpuBankCurrent,CPU_THINK);
+    } else {
+      setStatus(`${p.name} holds ${hc} ${hc===1?'die':'dice'} (${h.name})…`);setTimeout(cpuDoRoll,CPU_ROLL_GAP);
+    }
   });
+}
+
+function cpuUseWildCharge(){
+  const p=players[currentPlayerIdx];
+  // Find the best die to replace: pick the unheld die whose removal + replacement with A improves the hand most
+  let bestDieIdx=-1, bestFace=FACES[0], bestPts=-1;
+  dice.forEach((f,i)=>{
+    FACES.forEach(candidate=>{
+      const test=[...dice];test[i]=candidate;
+      const pts=evalHand(test).pts;
+      if(pts>bestPts){bestPts=pts;bestDieIdx=i;bestFace=candidate;}
+    });
+  });
+  setStatus(`${p.name} uses ★ Wild Die — sets die to ${bestFace}!`);
+  dice[bestDieIdx]=bestFace;held[bestDieIdx]=true;wildCharge=false;
+  renderTray('dice-tray',dice,held,{isCpu:true});
+  const h=evalHand(dice);setHandDisplay(h.name,h.pts,true);
+  const hc=held.filter(Boolean).length;
+  if(rollsLeft===0||hc===5||h.pts>=75){setTimeout(cpuBankCurrent,CPU_THINK);}
+  else{setTimeout(cpuDoRoll,CPU_ROLL_GAP);}
 }
 function cpuBankCurrent(){
   const hand=evalHand(dice);
