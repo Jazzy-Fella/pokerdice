@@ -893,6 +893,7 @@ const WILD_FACES=[
   {id:'skip-fold', label:'SKIP', title:'Skip & Fold',          color:'#ff2222',desc:'You are skipped and automatically fold this round.'},
 ];
 let wildDicePenalty=[]; // boolean per player: next startTurn removes 1 die
+let wildDiceCount=[];   // number of dice each player has (resets each round)
 let wildLockedDieIdx=-1; // index of die locked to '9'
 let wildBlankIdxs=[]; // indices of blank (hidden) dice
 let wildCharge=false; // player has a wild-die charge to use
@@ -1413,10 +1414,12 @@ function findNextUnbanked(afterIdx){
 function startTurn(idx){
   clearShake();
   currentPlayerIdx=idx;
-  // Wild mode: apply any pending dice penalty (literally one fewer die)
-  const penalty=gameMode==='wild'&&wildDicePenalty[idx];
-  if(penalty)wildDicePenalty[idx]=false;
-  const diceCount=penalty?4:5;
+  // Wild mode: apply any pending dice penalty, then use tracked count
+  if(gameMode==='wild'&&wildDicePenalty[idx]){
+    wildDicePenalty[idx]=false;
+    wildDiceCount[idx]=Math.max(1,wildDiceCount[idx]-1);
+  }
+  const diceCount=gameMode==='wild'?wildDiceCount[idx]:5;
   dice=Array.from({length:diceCount},()=>FACES[Math.floor(Math.random()*6)]);
   held=Array(diceCount).fill(false);
   wildLockedDieIdx=-1;
@@ -1648,6 +1651,7 @@ function betStartBettingRound(){
   bTotalPot = MIN_ANTE*active.length;
 
   bankedThisRound=[];
+  if(gameMode==='wild') wildDiceCount=players.map(()=>5); // reset dice counts each round
   document.getElementById('betting-panel').style.display='none';
   document.getElementById('roll-area').style.display='none';
 
@@ -1900,6 +1904,7 @@ function rematch(){
 function initWildMode(){
   wildDicePenalty=players.map(()=>false);
   wildLockedDieIdx=-1;wildBlankIdxs=[];wildCharge=false;currentWildFace=0;
+  wildDiceCount=players.map(()=>5);
   betRound=1;pot=0;
   pState=players.map(()=>({bal:START_BAL,eliminated:false}));
   dealerIdx=activePlayers()[0]??0;
@@ -1980,7 +1985,9 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
     const next=findNextUnbanked(idx);
     if(next!==-1)wildDicePenalty[next]=true;
   } else if(face===4){ // you -1 die — remove one die from play
-    dice=dice.slice(0,4);held=held.slice(0,4);
+    const newCount=Math.max(1,dice.length-1);
+    wildDiceCount[idx]=newCount;
+    dice=dice.slice(0,newCount);held=held.slice(0,newCount);
     wildLockedDieIdx=-1;
   } else if(face===5){ // two dice go dark
     const idxs=[0,1,2,3,4].sort(()=>Math.random()-0.5).slice(0,2);
