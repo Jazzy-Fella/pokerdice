@@ -2007,8 +2007,15 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
     const idxs=[0,1,2,3,4].sort(()=>Math.random()-0.5).slice(0,2);
     wildBlankIdxs=idxs;
   } else if(face===6){ // skip & fold
-    setStatus(`${players[idx].name} is skipped!`);
-    setTimeout(()=>doFold(idx),400);
+    bFolded[idx]=true; bStatus[idx]='fold';
+    setStatus(`${players[idx].name} folds and is out!`);
+    document.getElementById('betting-panel').style.display='none';
+    renderScoreboard();
+    setTimeout(()=>{
+      const next=findNextUnbanked(idx);
+      if(next===-1){ betResolveRound(); }
+      else { startTurn(next); }
+    }, 800);
     return;
   }
 
