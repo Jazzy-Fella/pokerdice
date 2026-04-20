@@ -842,7 +842,7 @@ const PLAYER_BG     = ['rgba(255,215,0,0.18)','rgba(180,100,220,0.18)','rgba(68,
 const PLAYER_GLOW   = ['rgba(255,215,0,0.5)','rgba(180,100,220,0.5)','rgba(68,221,255,0.5)','rgba(255,153,68,0.5)'];
 const AI_NAMES = ['James','Emma','Oliver','Sophia','Harry','Isla','Charlie','Amelia','Jack','Grace','Liam','Chloe','Noah','Lucy','Leo','Poppy','Freddie','Daisy','Alfie','Ruby'];
 function randomAiName(exclude=[]){ const pool=AI_NAMES.filter(n=>!exclude.includes(n)); return pool[Math.floor(Math.random()*pool.length)]; }
-const DEFAULT_NAMES = ['You','AI','AI','AI'];
+const DEFAULT_NAMES = ['Player 1','AI','AI','AI'];
 
 const TOTAL_ROUNDS = 5;
 const MAX_ROLLS    = 3;
@@ -865,8 +865,8 @@ const HANDS = [
 // ── Setup state ───────────────────────────────────────────────────────────────
 let gameMode = null;
 let setupPlayers = [
-  {name:'You',           isHuman:true},
-  {name:randomAiName(['You']), isHuman:false},
+  {name:'Player 1',           isHuman:true},
+  {name:randomAiName(['Player 1']), isHuman:false},
 ];
 
 // ── Game state ────────────────────────────────────────────────────────────────
@@ -1480,8 +1480,7 @@ function startTurn(idx){
     setBanner(`${p.name}'s Turn`,'cpu-turn');setStatus(`${p.name} is thinking…`);
     setTimeout(cpuDoRoll,CPU_THINK);
   } else {
-    const label=p.name==='You'?'Your Turn — Roll the Dice!':`${p.name}'s Turn — Roll the Dice!`;
-    setBanner(label,'human-turn');setStatus('Click Roll to start your turn');setRollBtns(true,false);
+    setBanner(`${p.name}'s Turn — Roll the Dice!`,'human-turn');setStatus('Click Roll to start your turn');setRollBtns(true,false);
   }
 }
 function cpuDoRoll(){
@@ -1761,11 +1760,9 @@ function showBettingUI(idx){
   bActingIdx=idx;
   const toCall=bCurrent-bContrib[idx];
   const p=players[idx];
-  const you=p.name==='You';
-
   document.getElementById('bi-current').textContent=fmt(bCurrent);
   document.getElementById('bi-pot').textContent=fmt(bTotalPot);
-  document.getElementById('bi-your-label').textContent=you?"You've put in":`${p.name} put in`;
+  document.getElementById('bi-your-label').textContent=`${p.name} put in`;
   document.getElementById('bi-your').textContent=fmt(bContrib[idx]);
   document.getElementById('bi-to-call').textContent=toCall>0?`call ${fmt(toCall)}`:'';
 
@@ -1775,8 +1772,7 @@ function showBettingUI(idx){
   refreshRaiseUI(idx);
   renderBettingStatus();
 
-  const label=you?'Your Betting Turn':`${p.name}'s Betting Turn`;
-  setBanner(label,'human-turn');setStatus('');
+  setBanner(`${p.name}'s Betting Turn`,'human-turn');setStatus('');
   document.getElementById('betting-panel').style.display='flex';
 }
 
@@ -1920,7 +1916,7 @@ function betResolveRound(){
 
   // In Wild Mode show a round winner summary before next round
   if(gameMode==='wild'){
-    const winnerNames=winners.map(w=>players[w.idx].isHuman?'You':players[w.idx].name);
+    const winnerNames=winners.map(w=>players[w.idx].name);
     const handName=winners[0].hand.name;
     const msg=winners.length>1
       ? `🏆 Tie — ${winnerNames.join(' & ')} split ${fmt(totalPot)} with ${handName}`
@@ -1977,7 +1973,7 @@ function wildShowPanel(idx,isCpu){
   slot.appendChild(makeWildDie(1,{unrolled:true}));
   document.getElementById('wild-outcome-text').innerHTML='';
   const p=players[idx];
-  const headerLabel=p.name==='You'?'Your Wild Die Roll':`${p.name}'s Wild Die Roll`;
+  const headerLabel=`${p.name}'s Wild Die Roll`;
   document.getElementById('wild-modal-header').textContent=headerLabel;
   document.getElementById('btn-wild-roll').style.display='';
   document.getElementById('btn-wild-roll').disabled=false;
@@ -1988,8 +1984,7 @@ function wildShowPanel(idx,isCpu){
     setBanner(`${p.name}'s Turn`,'cpu-turn');
     setTimeout(()=>rollWildDie(true),CPU_THINK);
   } else {
-    const label=p.name==='You'?'Your Turn':`${p.name}'s Turn`;
-    setBanner(label,'human-turn');
+    setBanner(`${p.name}'s Turn`,'human-turn');
   }
 }
 
@@ -2075,8 +2070,7 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
     setTimeout(cpuDoRoll,CPU_THINK);
   } else {
     const p=players[idx];
-    const label=p.name==='You'?'Your Turn — Roll the Dice!':`${p.name}'s Turn — Roll the Dice!`;
-    setBanner(label,'human-turn');
+    setBanner(`${p.name}'s Turn — Roll the Dice!`,'human-turn');
     if(wildCharge)setStatus('Roll first — then tap any die to set its face!');
     else if(face===1)setStatus('One roll only — choose wisely!');
     else setStatus('Click Roll to start your turn');
