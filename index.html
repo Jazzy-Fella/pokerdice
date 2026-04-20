@@ -1532,7 +1532,7 @@ function cpuDoRoll(){
   if(rollsLeft===0){cpuBankCurrent();return;}
   rollsLeft--;hasRolled=true;setStatus(`${p.name} rolling…`);
   animateRoll(true,()=>{
-    held=cpuDecideHold(dice,rollsLeft);renderTray('dice-tray',dice,held,{isCpu:true});
+    held=cpuDecideHold(dice,rollsLeft);renderTray('dice-tray',dice,held,{isCpu:true,...wildRenderOpts()});
     const h=evalHand(dice);setHandDisplay(h.name,h.pts,true);renderRollsLeft();
     const hc=held.filter(Boolean).length;
     if(wildCharge){
@@ -1558,7 +1558,7 @@ function cpuUseWildCharge(){
   });
   setStatus(`${p.name} uses ★ Wild Die — sets die to ${bestFace}!`);
   dice[bestDieIdx]=bestFace;held[bestDieIdx]=true;wildCharge=false;
-  renderTray('dice-tray',dice,held,{isCpu:true});
+  renderTray('dice-tray',dice,held,{isCpu:true,...wildRenderOpts()});
   const h=evalHand(dice);setHandDisplay(h.name,h.pts,true);
   const hc=held.filter(Boolean).length;
   if(rollsLeft===0||hc===5||h.pts>=75){setTimeout(cpuBankCurrent,CPU_THINK);}
