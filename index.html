@@ -1789,6 +1789,7 @@ function processNextBetter(){
   const remaining=activePlayers().filter(i=>!bFolded[i]);
   if(remaining.length===1){
     const winner=remaining[0];
+    const winPot=bTotalPot;
     pState[winner].bal+=bTotalPot;
     flashDelta(winner,bTotalPot-bContrib[winner],true);
     players.forEach((_,i)=>{if(bContrib[i]>0&&i!==winner)flashDelta(i,-bContrib[i],true);});
@@ -1803,7 +1804,7 @@ function processNextBetter(){
       document.getElementById('wrm-label').textContent='Everyone Folded!';
       document.getElementById('wrm-winner').textContent=wName;
       document.getElementById('wrm-hand').textContent='Last player standing';
-      document.getElementById('wrm-pot').textContent=`Wins ${fmt(bTotalPot||pot)}`;
+      document.getElementById('wrm-pot').textContent=`Wins ${fmt(winPot)}`;
       document.getElementById('wild-round-modal').classList.add('visible');
       setBanner('','idle-turn');
     } else {
