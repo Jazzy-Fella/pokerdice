@@ -865,12 +865,13 @@
 </div>
 
 <script>
-// Prevent double-tap from shifting the viewport on iOS Safari
+// Prevent double-tap from shifting the viewport on iOS Safari (skip interactive elements)
 ;(()=>{
   let last=0;
   document.addEventListener('touchend',e=>{
     const now=Date.now();
-    if(now-last<300) e.preventDefault();
+    if(now-last<300 && !e.target.closest('button,a,input,select,[role="button"]'))
+      e.preventDefault();
     last=now;
   },{passive:false});
 })();
