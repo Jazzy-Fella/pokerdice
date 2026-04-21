@@ -673,7 +673,7 @@
 
       <!-- Action buttons -->
       <div class="bet-action-btns">
-        <button class="btn btn-fold"  onclick="playerFold()">Fold</button>
+        <button class="btn btn-fold" id="btn-fold" onclick="playerFold()">Fold</button>
         <button class="btn btn-call"  id="btn-call"  onclick="playerCheckCall()">Check</button>
         <button class="btn btn-raise" id="btn-raise" onclick="playerRaiseBet()">Raise</button>
       </div>
@@ -1866,6 +1866,9 @@ function showBettingUI(idx){
   refreshRaiseUI(idx);
   renderBettingStatus();
 
+  const isShortStack=pState[idx].bal<=MIN_ANTE;
+  document.getElementById('btn-fold').disabled=isShortStack;
+
   setBanner(`${p.name}'s Betting Turn`,'human-turn');setStatus('');
   setBettingPanelOff(false);
 }
@@ -1898,7 +1901,7 @@ function raiseAllIn(){
 }
 function resetRaise(){bRaiseAmt=MIN_RAISE;refreshRaiseUI(bActingIdx);}
 
-function playerFold()     {doFold(bActingIdx);}
+function playerFold()     {if(pState[bActingIdx].bal<=MIN_ANTE)return;doFold(bActingIdx);}
 function playerCheckCall(){doCall(bActingIdx);}
 function playerRaiseBet() {doRaise(bActingIdx,bRaiseAmt);}
 
@@ -1919,11 +1922,13 @@ function doFold(idx){
   setTimeout(processNextBetter,500);
 }
 function doCall(idx){
-  const toAdd=bCurrent-bContrib[idx];
-  if(toAdd>0){pState[idx].bal-=toAdd;bContrib[idx]=bCurrent;bTotalPot+=toAdd;}
-  bStatus[idx]=toAdd>0?'call':'check';
+  const needed=bCurrent-bContrib[idx];
+  const toAdd=Math.min(needed,pState[idx].bal);
+  if(toAdd>0){pState[idx].bal-=toAdd;bContrib[idx]+=toAdd;bTotalPot+=toAdd;}
+  const isAllin=toAdd>0&&pState[idx].bal===0;
+  bStatus[idx]=needed<=0?'check':(isAllin?'allin':'call');
   setBettingPanelOff(true);
-  setStatus(toAdd>0?'Calls.':'Checks.');
+  setStatus(needed<=0?'Checks.':(isAllin?'All in!':'Calls.'));
   renderScoreboard();updateBelowStrip();
   setTimeout(processNextBetter,400);
 }
@@ -1953,13 +1958,18 @@ function cpuBettingAction(idx){
   const bal=pState[idx].bal;
 
   if(toCall>0&&bal<toCall){
-    // Can't afford to call — forced fold
-    setStatus("Can't call — folds.");
-    setTimeout(()=>doFold(idx),CPU_THINK*0.6);
+    if(bal<=MIN_ANTE){
+      // Short stack — must go all in, cannot fold
+      setStatus('All in!');
+      setTimeout(()=>doCall(idx),CPU_THINK*0.6);
+    } else {
+      setStatus("Can't call — folds.");
+      setTimeout(()=>doFold(idx),CPU_THINK*0.6);
+    }
     return;
   }
-  if(toCall>bal*0.5){
-    // Expensive call — fold ~60% of the time
+  if(toCall>bal*0.5&&bal>MIN_ANTE){
+    // Expensive call — fold ~60% of the time (only if not short-stacked)
     setStatus('Considering…');
     setTimeout(()=>Math.random()<0.6?doFold(idx):doCall(idx),CPU_THINK);
     return;
