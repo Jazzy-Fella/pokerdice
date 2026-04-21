@@ -1177,7 +1177,7 @@ function animateRoll(isCpu,onDone){
   const iv=setInterval(()=>{
     ticks++;
     dice=dice.map((f,i)=>held[i]?f:FACES[Math.floor(Math.random()*6)]);
-    renderTray('dice-tray',dice,held,{isCpu,rollingMask:dice.map((_,i)=>!held[i]&&ticks<7)});
+    renderTray('dice-tray',dice,held,{isCpu,rollingMask:dice.map((_,i)=>!held[i]&&ticks<7),...wildRenderOpts()});
     if(ticks>=7){clearInterval(iv);onDone();}
   },65);
 }
