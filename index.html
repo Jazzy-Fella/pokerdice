@@ -1600,6 +1600,9 @@ function bankHand(idx,hand,diceArr){
     flashDelta(idx,hand.pts,false);
     renderScoreboard();
   }
+  if(gameMode==='wild'&&(!pState[idx].bestHand||hand.pts>pState[idx].bestHand.pts)){
+    pState[idx].bestHand=hand;
+  }
   const next=findNextUnbanked(idx);
   if(next===-1){setTimeout(()=>gameMode==='score'?scoreEndRound():betResolveRound(),600);}
   else{setTimeout(()=>startTurn(next),800);}
@@ -2049,12 +2052,40 @@ function betResolveRound(){
 function betShowGameOver(){
   const maxBal=Math.max(...pState.map(s=>s.bal));
   const winners=pState.map((s,i)=>i).filter(i=>pState[i].bal===maxBal);
+  const wl=document.getElementById('final-winner-label'),sub=document.getElementById('final-sub');
+
+  if(gameMode==='wild'){
+    const wIdx=winners[0];
+    const netGain=pState[wIdx].bal-START_BAL;
+    const bh=pState[wIdx].bestHand;
+    const bestHandStr=bh?(bh.kicker?`${bh.name} · ${bh.kicker}`:bh.name):'—';
+    document.getElementById('final-scores').innerHTML=`
+      <div style="width:100%;display:flex;flex-direction:column;gap:10px;margin:4px 0 14px;padding:14px;background:rgba(0,0,0,0.25);border-radius:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:0.7rem;color:#a8c8a0;text-transform:uppercase;letter-spacing:0.1em">Won</span>
+          <span style="font-size:1.15rem;font-weight:bold;color:#ffd700">${fmtS(netGain)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:0.7rem;color:#a8c8a0;text-transform:uppercase;letter-spacing:0.1em">Hands played</span>
+          <span style="font-size:1.15rem;font-weight:bold;color:#f0e6c8">${betRound-1}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:0.7rem;color:#a8c8a0;text-transform:uppercase;letter-spacing:0.1em">Best hand</span>
+          <span style="font-size:1rem;font-weight:bold;color:#c8dfc8">${bestHandStr}</span>
+        </div>
+      </div>`;
+    wl.textContent=`${players[wIdx].name} Wins!`;
+    wl.className='final-winner-label';
+    sub.textContent='';
+    document.getElementById('overlay').classList.add('visible');
+    return;
+  }
+
   document.getElementById('final-scores').innerHTML=players.map((p,i)=>{
     const isWinner=winners.length===1&&winners[0]===i;
     const delta=pState[i].bal-START_BAL;
     return `<div class="fsc${isWinner?' winner-col':''}"><div class="fsc-name" style="color:${PLAYER_COLORS[i]}">${p.name}</div><div class="fsc-main" style="color:${PLAYER_COLORS[i]}">${fmt(pState[i].bal)}</div><div class="fsc-sub">${fmtS(delta)}</div></div>`;
   }).join('');
-  const wl=document.getElementById('final-winner-label'),sub=document.getElementById('final-sub');
   if(winners.length>1){wl.textContent="It's a Tie!";wl.className='final-winner-label tie';sub.textContent=`Tied at ${fmt(maxBal)}`;}
   else{wl.textContent=`${players[winners[0]].name} Wins!`;wl.className='final-winner-label';sub.textContent=`${players[winners[0]].name} finishes with ${fmt(pState[winners[0]].bal)} after ${betRound-1} rounds`;}
   document.getElementById('overlay').classList.add('visible');
@@ -2072,7 +2103,7 @@ function initWildMode(){
   wildLockedDieIdx=-1;wildBlankIdxs=[];wildCharge=false;currentWildFace=0;
   wildDiceCount=players.map(()=>5);
   betRound=1;pot=0;
-  pState=players.map(()=>({bal:START_BAL,eliminated:false}));
+  pState=players.map(()=>({bal:START_BAL,eliminated:false,bestHand:null}));
   dealerIdx=activePlayers()[0]??0;
   bankedThisRound=[];
   document.getElementById('roll-area').style.display='none';
