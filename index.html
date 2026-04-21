@@ -865,12 +865,13 @@
 </div>
 
 <script>
-// Prevent double-tap from shifting the viewport on iOS Safari (skip interactive elements)
+// Prevent double-tap from shifting the viewport on iOS Safari
+// Allow rapid taps only on the roll buttons
 ;(()=>{
   let last=0;
   document.addEventListener('touchend',e=>{
     const now=Date.now();
-    if(now-last<300 && !e.target.closest('button,a,input,select,[role="button"]'))
+    if(now-last<300 && !e.target.closest('#btn-roll,#free-roll-btn'))
       e.preventDefault();
     last=now;
   },{passive:false});
