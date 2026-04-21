@@ -871,7 +871,7 @@
   let last=0;
   document.addEventListener('touchend',e=>{
     const now=Date.now();
-    if(now-last<300 && !e.target.closest('#btn-roll,#free-roll-btn'))
+    if(now-last<300 && !e.target.closest('#btn-roll,#free-roll-btn.btn-roll'))
       e.preventDefault();
     last=now;
   },{passive:false});
