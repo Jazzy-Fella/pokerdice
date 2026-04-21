@@ -865,6 +865,16 @@
 </div>
 
 <script>
+// Prevent double-tap from shifting the viewport on iOS Safari
+;(()=>{
+  let last=0;
+  document.addEventListener('touchend',e=>{
+    const now=Date.now();
+    if(now-last<300) e.preventDefault();
+    last=now;
+  },{passive:false});
+})();
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 const FACES      = ['9','10','J','Q','K','A'];
 const FACE_COLOR  = {'9':'#111','10':'#c0392b','J':'#111','Q':'#c0392b','K':'#111','A':'#c0392b'};
