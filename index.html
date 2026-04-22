@@ -1524,6 +1524,7 @@ function freeUpdateHand(){
 function selectMode(mode){
   gameMode=mode;
   document.getElementById('mode-select').style.display='none';
+  document.getElementById('settings-cog').style.display='none';
   const modeTitle=mode==='score'?'🎯 Score Mode':mode==='wild'?'🃏 Wild Mode':mode==='free'?'🎲 Classic Mode':'💰 Betting Mode';
   document.getElementById('setup-title').textContent=modeTitle+' — Players';
   renderSetupRows();
@@ -1584,6 +1585,7 @@ function goToModeSelect(){
   document.getElementById('free-change-mode-btn').style.display='none';
   document.getElementById('score-hand-ref').style.display='none';
   document.getElementById('mode-select').style.display='flex';
+  document.getElementById('settings-cog').style.display='flex';
 }
 
 // ── Shared turn engine ────────────────────────────────────────────────────────
