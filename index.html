@@ -303,7 +303,7 @@
     .rolls-left { font-size: 0.76rem; color: #a8c8a0; }
     .pip { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #a8c8a0; margin: 0 2px; transition: background 0.2s; }
     .pip.active { background: #ffd700; }
-    .status-text { font-size: 0.7rem; color: #7aa87a; text-align: center; height: 1.1em; overflow: hidden; }
+    .status-text { font-size: 0.7rem; color: #7aa87a; text-align: center; min-height: 1.4em; }
 
 
     /* ── Hand reference ─────────────────────────── */
@@ -456,15 +456,14 @@
     #free-change-mode-btn:hover, #game-change-mode-btn:hover { opacity: 1; }
     /* ── Settings cog ───────────────────────────────── */
     #settings-cog {
-      position: fixed; top: calc(env(safe-area-inset-top) + 12px); left: 16px;
-      width: 40px; height: 40px; border-radius: 50%;
-      background: rgba(0,0,0,0.35); border: 1px solid rgba(255,215,0,0.25);
-      color: #f0e6c8; font-size: 1.2rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      z-index: 50; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-      transition: background 0.2s, border-color 0.2s;
+      position: fixed; top: calc(env(safe-area-inset-top) + 10px); left: 16px; z-index: 50;
+      background: rgba(0,0,0,0.55); border: 1px solid rgba(255,215,0,0.35);
+      color: #ffd700; font-family: 'Georgia', serif; font-size: 0.75rem;
+      padding: 6px 14px; border-radius: 20px; cursor: pointer; letter-spacing: 0.05em;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.2s, background 0.2s;
     }
-    #settings-cog:hover { background: rgba(0,0,0,0.55); border-color: rgba(255,215,0,0.5); }
+    #settings-cog:hover { border-color: rgba(255,215,0,0.7); background: rgba(0,0,0,0.75); }
 
     /* ── Settings modal ─────────────────────────────── */
     #settings-modal {
@@ -610,6 +609,7 @@
     .fsc-sub  { font-size: 0.6rem; color: #7aa87a; margin-top: 2px; }
     .final-winner-label { font-size: 1.15rem; font-weight: bold; color: #f0e6c8; margin-bottom: 4px; }
     .final-winner-label.tie { color: #a8c8a0; }
+    .final-winner-label.eliminated { color: #ff6666; }
     .final-sub { font-size: 0.78rem; color: #a8c8a0; margin-bottom: 16px; }
     .overlay-btns { display: flex; flex-direction: column; align-items: center; gap: 8px; }
   </style>
@@ -1170,7 +1170,7 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
 
   // State → face fill and border stroke
   const isRedDice = (typeof settings !== 'undefined') && settings.diceColour === 'red';
-  const faceFill    = isRevealed ? '#e8f6ff' : isCpuHeld ? (isRedDice?'#cc2244':'#f5eeff') : isHeld ? (isRedDice?'#ff9999':'#fffce8') : (isRedDice?'#cc2222':'#ffffff');
+  const faceFill    = isRevealed ? (isRedDice?'#ff9999':'#e8f6ff') : isCpuHeld ? (isRedDice?'#cc2244':'#f5eeff') : isHeld ? (isRedDice?'#ff9999':'#fffce8') : (isRedDice?'#cc2222':'#ffffff');
   const strokeColor = isRevealed ? '#44aaff' : isCpuHeld ? '#bb66ff' : isHeld ? '#ffd700' : (isRedDice?'#991111':'#c8c8c8');
   const strokeWidth = isRevealed ? 4 : (isCpuHeld||isHeld) ? 4 : 1.5;
 
@@ -1566,6 +1566,7 @@ function addPlayer(){
 }
 function removePlayer(){if(setupPlayers.length<=2)return;setupPlayers.pop();renderSetupRows();}
 function startGame(){
+  _acquireWakeLock();
   players=setupPlayers.map(p=>({name:(p.name||'Player').trim(),isHuman:p.isHuman}));
   document.getElementById('player-setup').style.display='none';
   if(gameMode==='free'){initFreeMode();return;}
@@ -1574,6 +1575,7 @@ function startGame(){
   if(gameMode==='score')initScoreMode();else if(gameMode==='wild')initWildMode();else initBetMode();
 }
 function goToModeSelect(){
+  _releaseWakeLock();
   clearShake();
   document.activeElement?.blur();
   document.getElementById('overlay').classList.remove('visible');
@@ -1832,6 +1834,8 @@ function initBetMode(){
 function betStartBettingRound(){
   const active=activePlayers();
   if(active.length<2){betShowGameOver();return;}
+  const humanIdx=players.findIndex(p=>p.isHuman);
+  if(humanIdx!==-1&&pState[humanIdx].eliminated){betShowHumanEliminated();return;}
 
   // Advance dealer each round (skip on round 1 — dealerIdx already set by initBetMode)
   if(betRound>1)advanceDealer(active);
@@ -2142,6 +2146,39 @@ function betResolveRound(){
   } else {
     setTimeout(betStartBettingRound,1800);
   }
+}
+
+function betShowHumanEliminated(){
+  const humanIdx=players.findIndex(p=>p.isHuman);
+  const wl=document.getElementById('final-winner-label');
+  const sub=document.getElementById('final-sub');
+  const bh=pState[humanIdx].bestHand;
+  const bestHandStr=bh?(bh.kicker?`${bh.name} · ${bh.kicker}`:bh.name):'—';
+  const remaining=activePlayers().map(i=>players[i].name).join(', ');
+  const statsHtml=`
+    <div style="width:100%;display:flex;flex-direction:column;gap:10px;margin:4px 0 14px;padding:14px;background:rgba(0,0,0,0.25);border-radius:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:0.7rem;color:#a8c8a0;text-transform:uppercase;letter-spacing:0.1em">Lost</span>
+        <span style="font-size:1.15rem;font-weight:bold;color:#ff6666">${fmt(START_BAL)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:0.7rem;color:#a8c8a0;text-transform:uppercase;letter-spacing:0.1em">Hands played</span>
+        <span style="font-size:1.15rem;font-weight:bold;color:#f0e6c8">${betRound-1}</span>
+      </div>
+      ${gameMode==='wild'?`<div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:0.7rem;color:#a8c8a0;text-transform:uppercase;letter-spacing:0.1em">Best hand</span>
+        <span style="font-size:1rem;font-weight:bold;color:#c8dfc8">${bestHandStr}</span>
+      </div>`:''}
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:0.7rem;color:#a8c8a0;text-transform:uppercase;letter-spacing:0.1em">Still playing</span>
+        <span style="font-size:0.9rem;font-weight:bold;color:#f0e6c8">${remaining}</span>
+      </div>
+    </div>`;
+  document.getElementById('final-scores').innerHTML=statsHtml;
+  wl.textContent='You\'re Out!';
+  wl.className='final-winner-label eliminated';
+  sub.textContent='Better luck next time';
+  document.getElementById('overlay').classList.add('visible');
 }
 
 function betShowGameOver(){
@@ -2528,6 +2565,22 @@ function setShakeMode(enable){
 function toggleShakeMode(){ setShakeMode(!shakeEnabled); }
 
 applySettings();
+
+// ── Screen Wake Lock ───────────────────────────────────────────────────────────
+let _wakeLock = null;
+async function _acquireWakeLock(){
+  if(!('wakeLock' in navigator)) return;
+  try { _wakeLock = await navigator.wakeLock.request('screen'); } catch(e){}
+}
+function _releaseWakeLock(){
+  _wakeLock?.release(); _wakeLock = null;
+}
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible' && _wakeLock===null){
+    // Re-acquire if we're in a game (mode-select is hidden)
+    if(document.getElementById('mode-select').style.display==='none') _acquireWakeLock();
+  }
+});
 
 // Prevent iOS Safari pull-to-refresh and overscroll bounce
 // but allow scrolling inside elements that actually scroll (e.g. how-to-play modal)
