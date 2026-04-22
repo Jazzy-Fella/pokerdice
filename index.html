@@ -1995,7 +1995,9 @@ function betStartRollingPhase(){
   pot=bTotalPot;bTotalPot=0;
   bActingIdx=-1;
   const bpEl=document.getElementById('betting-panel');
-  setBettingPanelOff(false); bpEl.style.display='none';
+  bpEl.style.display='none';
+  bpEl.classList.remove('bp-off');
+  document.querySelector('.table').classList.remove('table-bp-off');
   document.getElementById('roll-area').style.display='flex';
   updateBelowStrip();
   const active=activePlayers();
