@@ -453,17 +453,70 @@
       z-index: 10;
     }
     #free-change-mode-btn:hover, #game-change-mode-btn:hover { opacity: 1; }
-    #shake-toggle-btn {
-      position: fixed; bottom: calc(env(safe-area-inset-bottom) + 14px);
-      left: 50%; transform: translateX(-50%);
-      font-size: 0.72rem; opacity: 0.6; z-index: 10;
-      background: transparent; border: 1px solid rgba(240,230,200,0.35); border-radius: 50px;
-      padding: 10px 22px; font-family: 'Georgia', serif; cursor: pointer;
-      color: #f0e6c8; touch-action: manipulation;
-      transition: opacity 0.2s, color 0.2s, border-color 0.2s;
+    /* ── Settings cog ───────────────────────────────── */
+    #settings-cog {
+      position: fixed; top: calc(env(safe-area-inset-top) + 12px); left: 16px;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(0,0,0,0.35); border: 1px solid rgba(255,215,0,0.25);
+      color: #f0e6c8; font-size: 1.2rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 50; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+      transition: background 0.2s, border-color 0.2s;
     }
-    #shake-toggle-btn:hover { opacity: 1; }
-    #shake-toggle-btn.shake-on { color: #ffd700; opacity: 0.85; border-color: rgba(255,215,0,0.6); }
+    #settings-cog:hover { background: rgba(0,0,0,0.55); border-color: rgba(255,215,0,0.5); }
+
+    /* ── Settings modal ─────────────────────────────── */
+    #settings-modal {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.75); align-items: center; justify-content: center;
+    }
+    #settings-modal.visible { display: flex; }
+    .settings-card {
+      background: linear-gradient(160deg, #0a1f0e, #061409);
+      border: 2px solid rgba(255,215,0,0.4); border-radius: 20px;
+      padding: 24px 22px 20px; width: calc(100% - 48px); max-width: 340px;
+      display: flex; flex-direction: column; gap: 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+    }
+    .settings-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .settings-title {
+      font-family: 'Cinzel', 'Georgia', serif; font-size: 1.1rem;
+      color: #ffd700; letter-spacing: 0.06em;
+    }
+    .settings-close {
+      background: transparent; border: none; color: #a8c8a0;
+      font-size: 1.3rem; cursor: pointer; padding: 4px 8px;
+      touch-action: manipulation; line-height: 1;
+    }
+    .settings-row {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .settings-label {
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #a8c8a0;
+    }
+    .sopt-group { display: flex; gap: 8px; }
+    .sopt {
+      flex: 1; padding: 9px 0; border-radius: 10px; text-align: center;
+      font-family: 'Georgia', serif; font-size: 0.88rem; cursor: pointer;
+      background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.15);
+      color: #c8dfc8; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .sopt.active {
+      background: rgba(255,215,0,0.18); border-color: rgba(255,215,0,0.7); color: #ffd700;
+    }
+
+    /* ── Black table theme ──────────────────────────── */
+    body.theme-black {
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.10'/%3E%3C/svg%3E"),
+        repeating-linear-gradient(0deg,   transparent 0, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px),
+        repeating-linear-gradient(90deg,  transparent 0, transparent 3px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px),
+        radial-gradient(ellipse at top, #222222 0%, #111111 60%, #050505 100%);
+    }
+    html.theme-black { background: #050505; }
 
     /* ── Classic Mode results overlay ───────────────── */
     #free-results-overlay {
@@ -606,7 +659,42 @@
   </div>
 </div>
 
-<button id="shake-toggle-btn" onclick="toggleShakeMode()">Enable Shake Mode</button>
+<!-- ── SETTINGS COG ──────────────────────────────────────────────────── -->
+<button id="settings-cog" onclick="openSettings()" aria-label="Settings">⚙</button>
+
+<!-- ── SETTINGS MODAL ────────────────────────────────────────────────── -->
+<div id="settings-modal">
+  <div class="settings-card">
+    <div class="settings-header">
+      <span class="settings-title">Settings</span>
+      <button class="settings-close" onclick="closeSettings()">✕</button>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-label">Table Colour</div>
+      <div class="sopt-group">
+        <button class="sopt active" id="sopt-table-green" onclick="setTableColour('green')">Green</button>
+        <button class="sopt"        id="sopt-table-black" onclick="setTableColour('black')">Black</button>
+      </div>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-label">Dice Colour</div>
+      <div class="sopt-group">
+        <button class="sopt active" id="sopt-dice-white" onclick="setDiceColour('white')">White</button>
+        <button class="sopt"        id="sopt-dice-red"   onclick="setDiceColour('red')">Red</button>
+      </div>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-label">Shake Mode</div>
+      <div class="sopt-group">
+        <button class="sopt active" id="sopt-shake-off" onclick="setShakeMode(false)">Off</button>
+        <button class="sopt"        id="sopt-shake-on"  onclick="setShakeMode(true)">On</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ── PLAYER SETUP ─────────────────────────────────────────────────── -->
 <div id="player-setup">
@@ -1067,8 +1155,9 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
   const isMini=(size==='mini');
 
   // State → face fill and border stroke
-  const faceFill    = isRevealed ? '#e8f6ff' : isCpuHeld ? '#f5eeff' : isHeld ? '#fffce8' : '#ffffff';
-  const strokeColor = isRevealed ? '#44aaff' : isCpuHeld ? '#bb66ff' : isHeld ? '#ffd700' : '#c8c8c8';
+  const isRedDice = (typeof settings !== 'undefined') && settings.diceColour === 'red';
+  const faceFill    = isRevealed ? '#e8f6ff' : isCpuHeld ? '#f5eeff' : isHeld ? (isRedDice?'#ff9999':'#fffce8') : (isRedDice?'#cc2222':'#ffffff');
+  const strokeColor = isRevealed ? '#44aaff' : isCpuHeld ? '#bb66ff' : isHeld ? '#ffd700' : (isRedDice?'#991111':'#c8c8c8');
   const strokeWidth = isRevealed ? 4 : (isCpuHeld||isHeld) ? 4 : 1.5;
 
   // Main face value text — centered in the 120×120 viewBox (center = 60,60)
@@ -1077,12 +1166,15 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
     : (face==='10' ? 50 : 62);
   const lsAttr = face==='10' ? ' letter-spacing="-3"' : '';
 
+  const textColor  = (isRedDice && !isHeld && !isCpuHeld && !isRevealed) ? '#ffffff' : '#111111';
+  const cornerColor= (isRedDice && !isHeld && !isCpuHeld && !isRevealed) ? '#ffcccc' : '#333333';
+
   let textSvg='';
   if(face){
     textSvg=`
       <text x="60" y="74" text-anchor="middle"
             font-family="Georgia,'Times New Roman',serif" font-weight="700"
-            font-size="${fontSize}"${lsAttr} fill="#111111">${face}</text>`;
+            font-size="${fontSize}"${lsAttr} fill="${textColor}">${face}</text>`;
     // Corner index labels (full size only — too small on mini)
     if(!isMini){
       const cfs = face==='10' ? 13 : 18;
@@ -1090,11 +1182,11 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
       textSvg+=`
       <text x="14" y="30" text-anchor="start"
             font-family="Georgia,'Times New Roman',serif" font-weight="700"
-            font-size="${cfs}"${cls} fill="#333">${face}</text>
+            font-size="${cfs}"${cls} fill="${cornerColor}">${face}</text>
       <g transform="rotate(180,60,60)">
         <text x="14" y="30" text-anchor="start"
               font-family="Georgia,'Times New Roman',serif" font-weight="700"
-              font-size="${cfs}"${cls} fill="#333">${face}</text>
+              font-size="${cfs}"${cls} fill="${cornerColor}">${face}</text>
       </g>`;
     }
   }
@@ -1418,7 +1510,6 @@ function freeUpdateHand(){
 function selectMode(mode){
   gameMode=mode;
   document.getElementById('mode-select').style.display='none';
-  document.getElementById('shake-toggle-btn').style.display='none';
   const modeTitle=mode==='score'?'🎯 Score Mode':mode==='wild'?'🃏 Wild Mode':mode==='free'?'🎲 Classic Mode':'💰 Betting Mode';
   document.getElementById('setup-title').textContent=modeTitle+' — Players';
   renderSetupRows();
@@ -1479,7 +1570,6 @@ function goToModeSelect(){
   document.getElementById('free-change-mode-btn').style.display='none';
   document.getElementById('score-hand-ref').style.display='none';
   document.getElementById('mode-select').style.display='flex';
-  document.getElementById('shake-toggle-btn').style.display='block';
 }
 
 // ── Shared turn engine ────────────────────────────────────────────────────────
@@ -2303,21 +2393,60 @@ let shakeEnabled = false;
   window._shakeRequestAndStart = requestAndStart;
 })();
 
-function toggleShakeMode(){
-  const btn=document.getElementById('shake-toggle-btn');
-  if(shakeEnabled){
-    shakeEnabled=false;
-    btn.textContent='Enable Shake Mode';
-    btn.classList.remove('shake-on');
-  } else {
+// ── Settings ──────────────────────────────────────────────────────────────────
+const SETTINGS_KEY = 'pokerDiceSettings';
+const settings = Object.assign({ tableColour: 'green', diceColour: 'white', shakeMode: false },
+  JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
+
+function saveSettings(){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
+
+function applySettings(){
+  // Table theme
+  document.body.classList.toggle('theme-black', settings.tableColour === 'black');
+  document.documentElement.classList.toggle('theme-black', settings.tableColour === 'black');
+  // Shake
+  shakeEnabled = settings.shakeMode;
+  // Sync option buttons
+  ['green','black'].forEach(v=>{
+    const el=document.getElementById(`sopt-table-${v}`);
+    if(el) el.classList.toggle('active', settings.tableColour===v);
+  });
+  ['white','red'].forEach(v=>{
+    const el=document.getElementById(`sopt-dice-${v}`);
+    if(el) el.classList.toggle('active', settings.diceColour===v);
+  });
+  document.getElementById('sopt-shake-off')?.classList.toggle('active', !settings.shakeMode);
+  document.getElementById('sopt-shake-on')?.classList.toggle('active',  settings.shakeMode);
+}
+
+function openSettings(){ document.getElementById('settings-modal').classList.add('visible'); }
+function closeSettings(){ document.getElementById('settings-modal').classList.remove('visible'); }
+
+function setTableColour(v){
+  settings.tableColour=v; saveSettings(); applySettings();
+}
+
+function setDiceColour(v){
+  settings.diceColour=v; saveSettings(); applySettings();
+  // Re-render dice if a game is active
+  if(typeof renderTray==='function') try{ renderTray(); }catch(e){}
+}
+
+function setShakeMode(enable){
+  if(enable){
     window._shakeRequestAndStart(granted=>{
       if(!granted){ alert('Motion access was denied. You can enable it in Settings → Safari → Motion & Orientation Access.'); return; }
-      shakeEnabled=true;
-      btn.textContent='Shake Mode ON';
-      btn.classList.add('shake-on');
+      settings.shakeMode=true; saveSettings(); applySettings();
     });
+  } else {
+    settings.shakeMode=false; shakeEnabled=false; saveSettings(); applySettings();
   }
 }
+
+// Legacy stub — no longer used but kept in case of stale references
+function toggleShakeMode(){ setShakeMode(!shakeEnabled); }
+
+applySettings();
 
 // Prevent iOS Safari pull-to-refresh and overscroll bounce
 // but allow scrolling inside elements that actually scroll (e.g. how-to-play modal)
