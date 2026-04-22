@@ -2226,6 +2226,7 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
       const remaining=activePlayers().filter(i=>!bFolded[i]);
       if(remaining.length===1){
         const winner=remaining[0];
+        const winPot=pot;
         pState[winner].bal+=pot;
         flashDelta(winner,pot,true);
         pot=0;
@@ -2235,7 +2236,7 @@ function wildApplyOutcomeAfterModal(face,idx,isCpu){
         document.getElementById('wrm-label').textContent='Everyone Folded!';
         document.getElementById('wrm-winner').textContent=players[winner].name;
         document.getElementById('wrm-hand').textContent='Last player standing';
-        document.getElementById('wrm-pot').textContent=`Wins ${fmt(pot)}`;
+        document.getElementById('wrm-pot').textContent=`Wins ${fmt(winPot)}`;
         document.getElementById('wild-round-modal').classList.add('visible');
         setBanner('','idle-turn');setStatus('');
         return;
