@@ -2116,25 +2116,45 @@ function initWildMode(){
 }
 
 function wildShowPanel(idx,isCpu){
-  // Reset modal state
-  const slot=document.getElementById('wild-die-tray');
-  slot.innerHTML='';
-  slot.appendChild(makeWildDie(1,{unrolled:true}));
-  document.getElementById('wild-outcome-text').innerHTML='';
+  _wildPendingIsCpu=isCpu;
   const p=players[idx];
-  const headerLabel=`${p.name}'s Wild Die Roll`;
-  document.getElementById('wild-modal-header').textContent=headerLabel;
-  document.getElementById('btn-wild-roll').style.display='';
-  document.getElementById('btn-wild-roll').disabled=false;
-  document.getElementById('btn-wild-continue').style.display='none';
-  document.getElementById('wild-modal').classList.add('visible');
-  setRollBtns(false,false);
-  if(isCpu){
-    setBanner(`${p.name}'s Turn`,'cpu-turn');
-    setTimeout(()=>rollWildDie(true),CPU_THINK);
-  } else {
-    setBanner(`${p.name}'s Turn`,'human-turn');
-  }
+
+  // Show wild die inline in the game screen — no separate modal
+  document.getElementById('roll-area').style.display='flex';
+  document.getElementById('banked-hands').style.display='none';
+  document.getElementById('wild-outcome-badge').style.visibility='hidden';
+
+  const tray=document.getElementById('dice-tray');
+  tray.innerHTML='';
+  tray.appendChild(makeWildDie(1,{unrolled:true}));
+
+  // Repurpose the main roll button for the wild die roll
+  const rollBtn=document.getElementById('btn-roll');
+  rollBtn.textContent='Roll Wild Die';
+  rollBtn.className='btn btn-wild-roll';
+  rollBtn.onclick=()=>rollWildDie(isCpu);
+  rollBtn.disabled=false;
+  document.getElementById('btn-bank').style.display='none';
+
+  // Clear pips/rolls display (not applicable during wild die phase)
+  for(let i=0;i<3;i++) document.getElementById(`pip-${i}`).className='pip';
+  document.getElementById('rolls-text').textContent='';
+  setHandDisplay('',0,isCpu);
+  setBanner(`${p.name}'s Wild Die Roll`,isCpu?'cpu-turn':'human-turn');
+  setStatus(isCpu?'Rolling…':'Tap to reveal your wild outcome!');
+
+  if(isCpu) setTimeout(()=>rollWildDie(true),CPU_THINK);
+}
+
+function wildContinueInline(){
+  // Restore normal roll controls before handing back to regular turn logic
+  const rollBtn=document.getElementById('btn-roll');
+  rollBtn.textContent='Shake & Roll';
+  rollBtn.className='btn btn-roll';
+  rollBtn.onclick=playerShakeRoll;
+  document.getElementById('btn-bank').style.display='';
+  renderRollsLeft();
+  wildApplyOutcomeAfterModal(currentWildFace,currentPlayerIdx,_wildPendingIsCpu);
 }
 
 function wildDismissModal(){
@@ -2149,8 +2169,8 @@ let _wildPendingIsCpu=false;
 
 function rollWildDie(isCpu=false){
   _wildPendingIsCpu=isCpu;
-  document.getElementById('btn-wild-roll').disabled=true;
-  const slot=document.getElementById('wild-die-tray');
+  document.getElementById('btn-roll').disabled=true;
+  const slot=document.getElementById('dice-tray');
   let ticks=0;
   const iv=setInterval(()=>{
     ticks++;
@@ -2162,16 +2182,16 @@ function rollWildDie(isCpu=false){
       slot.innerHTML='';
       slot.appendChild(makeWildDie(currentWildFace));
       const w=WILD_FACES[currentWildFace-1];
-      document.getElementById('wild-modal-header').textContent='';
-      document.getElementById('wild-outcome-text').innerHTML=
-        `<span class="wild-outcome-title" style="color:${w.color}">${w.title}</span>`+
-        `<span class="wild-outcome-desc">${w.desc}</span>`;
-      document.getElementById('btn-wild-roll').style.display='none';
-      // CPU: auto-dismiss after pause. Human: show Continue button
+      setBanner(w.title,isCpu?'cpu-turn':'human-turn');
+      setStatus(w.desc);
       if(isCpu){
-        setTimeout(wildDismissModal,1800);
+        setTimeout(wildContinueInline,1800);
       } else {
-        document.getElementById('btn-wild-continue').style.display='';
+        const rollBtn=document.getElementById('btn-roll');
+        rollBtn.textContent='Continue \u2192';
+        rollBtn.className='btn btn-wild-continue';
+        rollBtn.onclick=wildContinueInline;
+        rollBtn.disabled=false;
       }
     }
   },80);
