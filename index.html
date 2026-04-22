@@ -1207,10 +1207,10 @@ function renderScoreboard(){
     const showBetContrib=(gameMode==='bet'||gameMode==='wild')&&currentTurn==='bet'&&!pState[i].eliminated&&bContrib&&bContrib[i]>0;
     col.innerHTML=`
       <div class="ps-label" style="color:${PLAYER_COLORS[i]}">${p.name}</div>
-      ${isDealer?'<div class="dealer-btn">D</div>':''}
-      ${isFolded?'<div class="ps-folded-badge">Folded</div>':''}
       <div class="ps-value" style="color:${PLAYER_COLORS[i]};font-size:${valSize}" id="ps-val-${i}">${val}</div>
       ${showBetContrib?`<div class="ps-bet-contrib">bet: ${fmt(bContrib[i])}</div>`:''}
+      ${isDealer?'<div class="dealer-btn">D</div>':''}
+      ${isFolded?'<div class="ps-folded-badge">Folded</div>':''}
       <div class="ps-hand" id="ps-hand-${i}">${shortHand(banked)}</div>
       <div class="ps-delta" id="ps-delta-${i}">&nbsp;</div>`;
     sb.appendChild(col);
