@@ -1567,6 +1567,8 @@ function addPlayer(){
 function removePlayer(){if(setupPlayers.length<=2)return;setupPlayers.pop();renderSetupRows();}
 function startGame(){
   _acquireWakeLock();
+  // Clear WebKit undo history on all text inputs — prevents iOS "Undo Typing" dialog when shaking
+  document.querySelectorAll('input[type="text"]').forEach(inp=>{const v=inp.value;inp.value='';inp.value=v;inp.blur();});
   players=setupPlayers.map(p=>({name:(p.name||'Player').trim(),isHuman:p.isHuman}));
   document.getElementById('player-setup').style.display='none';
   if(gameMode==='free'){initFreeMode();return;}
