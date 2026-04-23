@@ -462,8 +462,10 @@
       padding: 6px 14px; border-radius: 20px; cursor: pointer; letter-spacing: 0.05em;
       touch-action: manipulation; -webkit-tap-highlight-color: transparent;
       transition: border-color 0.2s, background 0.2s;
+      display: flex; align-items: center; justify-content: center;
     }
     #settings-cog:hover { border-color: rgba(255,215,0,0.7); background: rgba(0,0,0,0.75); }
+    #settings-cog svg { width: 15px; height: 15px; fill: #ffd700; }
 
     /* ── Settings modal ─────────────────────────────── */
     #settings-modal {
@@ -496,6 +498,18 @@
     .settings-label {
       font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: #a8c8a0;
     }
+    .swatch-group { display: flex; gap: 12px; align-items: center; }
+    .swatch {
+      width: 38px; height: 38px; border-radius: 50%; flex: none;
+      border: 2.5px solid rgba(255,255,255,0.22); cursor: pointer;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none; appearance: none;
+    }
+    .swatch.active {
+      border-color: #ffd700;
+      box-shadow: 0 0 0 2.5px rgba(255,215,0,0.45);
+    }
     .sopt-group { display: flex; gap: 8px; }
     .sopt {
       flex: 1; padding: 9px 0; border-radius: 10px; text-align: center;
@@ -508,7 +522,7 @@
       background: rgba(255,215,0,0.18); border-color: rgba(255,215,0,0.7); color: #ffd700;
     }
 
-    /* ── Black table theme ──────────────────────────── */
+    /* ── Table themes ───────────────────────────────── */
     body.theme-black {
       background:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.10'/%3E%3C/svg%3E"),
@@ -517,6 +531,22 @@
         radial-gradient(ellipse at top, #222222 0%, #111111 60%, #050505 100%);
     }
     html.theme-black { background: #050505; }
+    body.theme-red {
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.14'/%3E%3C/svg%3E"),
+        repeating-linear-gradient(0deg,   transparent 0, transparent 3px, rgba(0,0,0,0.018) 3px, rgba(0,0,0,0.018) 4px),
+        repeating-linear-gradient(90deg,  transparent 0, transparent 3px, rgba(0,0,0,0.018) 3px, rgba(0,0,0,0.018) 4px),
+        radial-gradient(ellipse at top, #8b1a1a 0%, #4d0d0d 60%, #1f0808 100%);
+    }
+    html.theme-red { background: #100505; }
+    body.theme-blue {
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.14'/%3E%3C/svg%3E"),
+        repeating-linear-gradient(0deg,   transparent 0, transparent 3px, rgba(0,0,0,0.018) 3px, rgba(0,0,0,0.018) 4px),
+        repeating-linear-gradient(90deg,  transparent 0, transparent 3px, rgba(0,0,0,0.018) 3px, rgba(0,0,0,0.018) 4px),
+        radial-gradient(ellipse at top, #1a3d8b 0%, #0d1f4d 60%, #08101f 100%);
+    }
+    html.theme-blue { background: #050810; }
 
     /* ── Classic Mode results overlay ───────────────── */
     #free-results-overlay {
@@ -661,7 +691,7 @@
 </div>
 
 <!-- ── SETTINGS COG ──────────────────────────────────────────────────── -->
-<button id="settings-cog" onclick="openSettings()" aria-label="Settings">⚙</button>
+<button id="settings-cog" onclick="openSettings()" aria-label="Settings"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/></svg></button>
 
 <!-- ── SETTINGS MODAL ────────────────────────────────────────────────── -->
 <div id="settings-modal">
@@ -673,17 +703,22 @@
 
     <div class="settings-row">
       <div class="settings-label">Table Colour</div>
-      <div class="sopt-group">
-        <button class="sopt active" id="sopt-table-green" onclick="setTableColour('green')">Green</button>
-        <button class="sopt"        id="sopt-table-black" onclick="setTableColour('black')">Black</button>
+      <div class="swatch-group">
+        <button class="swatch active" id="sopt-table-green" onclick="setTableColour('green')" style="background:#1f6b1f" title="Green felt"></button>
+        <button class="swatch"        id="sopt-table-black" onclick="setTableColour('black')" style="background:#1e1e1e" title="Black felt"></button>
+        <button class="swatch"        id="sopt-table-red"   onclick="setTableColour('red')"   style="background:#7a1a1a" title="Red felt"></button>
+        <button class="swatch"        id="sopt-table-blue"  onclick="setTableColour('blue')"  style="background:#1a3d8b" title="Blue felt"></button>
       </div>
     </div>
 
     <div class="settings-row">
       <div class="settings-label">Dice Colour</div>
-      <div class="sopt-group">
-        <button class="sopt active" id="sopt-dice-white" onclick="setDiceColour('white')">White</button>
-        <button class="sopt"        id="sopt-dice-red"   onclick="setDiceColour('red')">Red</button>
+      <div class="swatch-group">
+        <button class="swatch active" id="sopt-dice-white" onclick="setDiceColour('white')" style="background:#f0f0f0" title="White dice"></button>
+        <button class="swatch"        id="sopt-dice-red"   onclick="setDiceColour('red')"   style="background:#cc2222" title="Red dice"></button>
+        <button class="swatch"        id="sopt-dice-blue"  onclick="setDiceColour('blue')"  style="background:#1a44cc" title="Blue dice"></button>
+        <button class="swatch"        id="sopt-dice-green" onclick="setDiceColour('green')" style="background:#1e8c3a" title="Green dice"></button>
+        <button class="swatch"        id="sopt-dice-black" onclick="setDiceColour('black')" style="background:#111111" title="Black dice"></button>
       </div>
     </div>
 
@@ -1140,9 +1175,11 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
 
   // Empty die: pre-roll state — plain face, no markings
   if(isEmpty){
-    const _red = (typeof settings !== 'undefined') && settings.diceColour === 'red';
+    const _dc = (typeof settings !== 'undefined') ? settings.diceColour : 'white';
+    const _ef = {white:'#ffffff',red:'#cc2222',green:'#1e8c3a',blue:'#1a44cc',black:'#111111'}[_dc]||'#ffffff';
+    const _es = {white:'#c8c8c8',red:'#991111',green:'#146030',blue:'#112299',black:'#555555'}[_dc]||'#c8c8c8';
     el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="4" width="112" height="112" rx="18" fill="${_red?'#cc2222':'#ffffff'}" stroke="${_red?'#991111':'#c8c8c8'}" stroke-width="1.5"/>
+      <rect x="4" y="4" width="112" height="112" rx="18" fill="${_ef}" stroke="${_es}" stroke-width="1.5"/>
       <rect x="4" y="4" width="112" height="112" rx="18" fill="url(#face-rim)" pointer-events="none"/>
     </svg><div class="held-badge">held</div>`;
     return el;
@@ -1169,9 +1206,14 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
   const isMini=(size==='mini');
 
   // State → face fill and border stroke
-  const isRedDice = (typeof settings !== 'undefined') && settings.diceColour === 'red';
-  const faceFill    = isRevealed ? (isRedDice?'#ff9999':'#e8f6ff') : isCpuHeld ? (isRedDice?'#cc2244':'#f5eeff') : isHeld ? (isRedDice?'#ff9999':'#fffce8') : (isRedDice?'#cc2222':'#ffffff');
-  const strokeColor = isRevealed ? '#44aaff' : isCpuHeld ? '#bb66ff' : isHeld ? '#ffd700' : (isRedDice?'#991111':'#c8c8c8');
+  const dc = (typeof settings !== 'undefined') ? settings.diceColour : 'white';
+  const _base  = {white:'#ffffff', red:'#cc2222', green:'#1e8c3a', blue:'#1a44cc', black:'#111111'}[dc]||'#ffffff';
+  const _held  = {white:'#fffce8', red:'#ff9999', green:'#99eebb', blue:'#aabfff', black:'#3a3a3a'}[dc]||'#fffce8';
+  const _cpu   = {white:'#f5eeff', red:'#cc2244', green:'#2a6642', blue:'#223388', black:'#252525'}[dc]||'#f5eeff';
+  const _stroke= {white:'#c8c8c8', red:'#991111', green:'#146030', blue:'#112299', black:'#555555'}[dc]||'#c8c8c8';
+  const _dark  = dc !== 'white';
+  const faceFill    = isRevealed ? (_dark?_held:'#e8f6ff') : isCpuHeld ? _cpu : isHeld ? _held : _base;
+  const strokeColor = isRevealed ? '#44aaff' : isCpuHeld ? '#bb66ff' : isHeld ? '#ffd700' : _stroke;
   const strokeWidth = isRevealed ? 4 : (isCpuHeld||isHeld) ? 4 : 1.5;
 
   // Main face value text — centered in the 120×120 viewBox (center = 60,60)
@@ -1180,8 +1222,11 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
     : (face==='10' ? 50 : 62);
   const lsAttr = face==='10' ? ' letter-spacing="-3"' : '';
 
-  const textColor  = (isRedDice && !isHeld && !isRevealed) ? '#ffffff' : '#111111';
-  const cornerColor= (isRedDice && !isHeld && !isRevealed) ? '#ffcccc' : '#333333';
+  const _cornerTint= {white:'#333333', red:'#ffcccc', green:'#ccffdd', blue:'#ccdaff', black:'#dddddd'}[dc]||'#333333';
+  // Black dice always have white pips (face is always dark). Other dark dice: white only when unselected.
+  const _pipWhite  = dc === 'black' || (_dark && !isHeld && !isRevealed);
+  const textColor  = _pipWhite ? '#ffffff' : '#111111';
+  const cornerColor= _pipWhite ? _cornerTint : '#333333';
 
   let textSvg='';
   if(face){
@@ -2521,17 +2566,20 @@ const settings = Object.assign({ tableColour: 'green', diceColour: 'white', shak
 function saveSettings(){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
 
 function applySettings(){
-  // Table theme
-  document.body.classList.toggle('theme-black', settings.tableColour === 'black');
-  document.documentElement.classList.toggle('theme-black', settings.tableColour === 'black');
+  // Table theme — remove all, apply current
+  ['black','red','blue'].forEach(t=>{ document.body.classList.remove(`theme-${t}`); document.documentElement.classList.remove(`theme-${t}`); });
+  if(settings.tableColour!=='green'){
+    document.body.classList.add(`theme-${settings.tableColour}`);
+    document.documentElement.classList.add(`theme-${settings.tableColour}`);
+  }
   // Shake
   shakeEnabled = settings.shakeMode;
   // Sync option buttons
-  ['green','black'].forEach(v=>{
+  ['green','black','red','blue'].forEach(v=>{
     const el=document.getElementById(`sopt-table-${v}`);
     if(el) el.classList.toggle('active', settings.tableColour===v);
   });
-  ['white','red'].forEach(v=>{
+  ['white','red','blue','green','black'].forEach(v=>{
     const el=document.getElementById(`sopt-dice-${v}`);
     if(el) el.classList.toggle('active', settings.diceColour===v);
   });
