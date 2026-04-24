@@ -1,4 +1,4 @@
-const CACHE = 'poker-dice-v4';
+const CACHE = 'poker-dice-v5';
 const ASSETS = [
   '/',
   '/index.html',

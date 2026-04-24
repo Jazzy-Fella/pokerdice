@@ -1949,7 +1949,9 @@ function freeBankHand(){
   document.getElementById('free-bank-btn').style.visibility='hidden';
   document.getElementById('free-bank-btn').style.pointerEvents='none';
   _freeSetNextBtn();
-  freeRenderTray();
+  // No freeRenderTray() here — innerHTML='' causes a brief layout reflow.
+  // Dice clicks are already blocked (rollsLeft===0 guard in freeToggleHold).
+  // freeStartTurn() will re-render fresh dice for the next player.
 }
 function _freeSetNextBtn(){
   const rb=document.getElementById('free-roll-btn');
