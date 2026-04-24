@@ -548,6 +548,259 @@
     }
     html.theme-blue { background: #050810; }
 
+    /* ── Windows 95 Mode ──────────────────────────────── */
+    body.theme-win95,
+    html.theme-win95 { background: #008080 !important; }
+    body.theme-win95 {
+      font-family: "MS Sans Serif","Microsoft Sans Serif",Arial,sans-serif !important;
+      color: #000 !important;
+    }
+    body.theme-win95 * {
+      font-family: "MS Sans Serif","Microsoft Sans Serif",Arial,sans-serif !important;
+    }
+    /* Title */
+    body.theme-win95 h1 {
+      font-family: "MS Sans Serif",Arial,sans-serif !important;
+      color: #fff !important; text-shadow: 2px 2px #000080 !important;
+      font-size: 1.6rem !important; letter-spacing: 0 !important;
+    }
+    body.theme-win95 .subtitle { color: #fff !important; }
+    /* Mode-select window */
+    body.theme-win95 .mode-card {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .mode-card h2,
+    body.theme-win95 .mode-card.bet-card h2,
+    body.theme-win95 .mode-card.wild-card h2,
+    body.theme-win95 .mode-card.free-card h2 { color: #000080 !important; }
+    body.theme-win95 .mode-card p { color: #000 !important; }
+    /* Setup card */
+    body.theme-win95 .setup-card {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .setup-card h2 { color: #000080 !important; }
+    body.theme-win95 .player-name-input {
+      background: #fff !important; border: none !important; border-radius: 0 !important;
+      box-shadow: inset 1px 1px #808080, inset -1px -1px #dfdfdf, inset 2px 2px #404040, inset -2px -2px #fff !important;
+      color: #000 !important;
+    }
+    /* Scoreboard */
+    body.theme-win95 .scoreboard {
+      background: #c0c0c0 !important; border-color: #808080 !important; border-radius: 0 !important;
+    }
+    body.theme-win95 .ps {
+      background: #c0c0c0 !important; border-radius: 0 !important;
+    }
+    body.theme-win95 .ps.active-turn {
+      background: #d4d0c8 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .ps + .ps { border-left-color: #808080 !important; }
+    body.theme-win95 .ps-label { color: #000 !important; }
+    body.theme-win95 .ps-value { color: #000080 !important; }
+    body.theme-win95 .ps-hand  { color: #444 !important; font-style: normal !important; }
+    body.theme-win95 .ps-delta.pos { color: #008000 !important; }
+    body.theme-win95 .ps-delta.neg { color: #800000 !important; }
+    body.theme-win95 .below-strip {
+      background: #c0c0c0 !important; border-color: #808080 !important;
+      border-radius: 0 !important; color: #000 !important;
+    }
+    /* Turn banner */
+    body.theme-win95 .turn-banner,
+    body.theme-win95 .turn-banner.human-turn,
+    body.theme-win95 .turn-banner.cpu-turn,
+    body.theme-win95 .turn-banner.bet-turn,
+    body.theme-win95 .turn-banner.idle-turn {
+      background: linear-gradient(90deg,#000080,#1084d0) !important;
+      color: #fff !important; border-color: #000080 !important; border-radius: 0 !important;
+      font-weight: bold !important;
+    }
+    /* Table panel */
+    body.theme-win95 .table {
+      background: #c0c0c0 !important; border-color: #808080 !important; border-radius: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .table.table-bp-off {
+      background: transparent !important; border-color: transparent !important;
+      box-shadow: none !important;
+    }
+    /* Bet info */
+    body.theme-win95 .bet-info-strip {
+      background: #d4d0c8 !important; border-color: #808080 !important; border-radius: 0 !important;
+    }
+    body.theme-win95 .bet-info-cell + .bet-info-cell { border-left-color: #808080 !important; }
+    body.theme-win95 .bet-info-label { color: #000 !important; }
+    body.theme-win95 .bet-info-val   { color: #000080 !important; }
+    body.theme-win95 .bet-info-sub   { color: #800000 !important; }
+    /* All buttons */
+    body.theme-win95 .btn {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      color: #000 !important; text-shadow: none !important; letter-spacing: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .btn:hover:not(:disabled) {
+      transform: none !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .btn:active:not(:disabled) {
+      box-shadow: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf !important;
+    }
+    body.theme-win95 .btn:disabled { opacity: 0.5 !important; cursor: not-allowed !important; }
+    body.theme-win95 .btn-mode {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      color: #000 !important; font-size: 0.72rem !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    /* Settings cog + hands btn */
+    body.theme-win95 #settings-cog,
+    body.theme-win95 #hands-btn {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      color: #000 !important; letter-spacing: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 #settings-cog:hover,
+    body.theme-win95 #hands-btn:hover { background: #c0c0c0 !important; }
+    body.theme-win95 #settings-cog svg { fill: #000 !important; }
+    /* Settings modal */
+    body.theme-win95 .settings-card {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .settings-header {
+      background: linear-gradient(90deg,#000080,#1084d0) !important;
+      margin: -24px -22px 0 !important; padding: 5px 8px !important; border-radius: 0 !important;
+    }
+    body.theme-win95 .settings-title {
+      color: #fff !important; letter-spacing: 0 !important; font-size: 0.85rem !important;
+    }
+    body.theme-win95 .settings-close {
+      background: #c0c0c0 !important; color: #000 !important;
+      border: none !important; border-radius: 0 !important; font-size: 0.72rem !important;
+      padding: 1px 5px !important; line-height: 1.4 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .settings-label { color: #000 !important; text-transform: none !important; letter-spacing: 0 !important; }
+    body.theme-win95 .sopt {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      color: #000 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .sopt.active {
+      background: #c0c0c0 !important; color: #000 !important;
+      box-shadow: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf !important;
+      border: 1px dotted #000 !important;
+    }
+    body.theme-win95 #colour-settings { opacity: 0.45 !important; pointer-events: none !important; }
+    /* Hands modal */
+    body.theme-win95 #hands-modal { background: rgba(0,0,0,0.75) !important; }
+    body.theme-win95 .hands-card {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+      color: #000 !important;
+    }
+    body.theme-win95 .hands-card-header h3 { color: #000 !important; }
+    body.theme-win95 .hands-close { color: #000 !important; }
+    body.theme-win95 .htp-intro,
+    body.theme-win95 .htp-turn-text { color: #000 !important; }
+    body.theme-win95 .htp-section-title {
+      color: #000080 !important; border-bottom-color: #808080 !important; text-transform: none !important;
+    }
+    body.theme-win95 .htp-row-name { color: #000080 !important; }
+    body.theme-win95 .htp-row-desc { color: #000 !important; }
+    body.theme-win95 .htp-mode-name,
+    body.theme-win95 .htp-mode-name.purple,
+    body.theme-win95 .htp-mode-name.orange,
+    body.theme-win95 .htp-mode-name.cyan { color: #000080 !important; }
+    body.theme-win95 .htp-mode-desc { color: #000 !important; }
+    /* Game-over overlay */
+    body.theme-win95 .overlay { background: rgba(0,128,128,0.88) !important; }
+    body.theme-win95 .overlay-card {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+      color: #000 !important;
+    }
+    body.theme-win95 .overlay-card h2 { color: #000080 !important; }
+    body.theme-win95 .final-scores { border-color: #808080 !important; border-radius: 0 !important; }
+    body.theme-win95 .fsc { background: #d4d0c8 !important; color: #000 !important; }
+    body.theme-win95 .fsc.winner-col { background: #000080 !important; color: #fff !important; }
+    body.theme-win95 .fsc-name,
+    body.theme-win95 .fsc-sub { color: inherit !important; }
+    body.theme-win95 .final-winner-label,
+    body.theme-win95 .final-winner-label.tie,
+    body.theme-win95 .final-winner-label.eliminated { color: #000 !important; }
+    body.theme-win95 .final-sub { color: #444 !important; }
+    /* Classic mode end screen */
+    body.theme-win95 #free-results-overlay { background: #008080 !important; }
+    body.theme-win95 .fr-card {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+      color: #000 !important;
+    }
+    body.theme-win95 .fr-winner { color: #000080 !important; }
+    body.theme-win95 .fr-title,
+    body.theme-win95 .fr-winner-hand { color: #000 !important; }
+    body.theme-win95 .fr-name { color: #000 !important; }
+    body.theme-win95 .fr-hand { color: #444 !important; }
+    body.theme-win95 .fr-row { background: #d4d0c8 !important; border-radius: 0 !important; }
+    body.theme-win95 .fr-row-winner { background: #000080 !important; border: none !important; }
+    body.theme-win95 .fr-row-winner .fr-name,
+    body.theme-win95 .fr-row-winner .fr-hand { color: #fff !important; }
+    /* Wild modals */
+    body.theme-win95 #wild-round-modal,
+    body.theme-win95 #wild-pick-modal,
+    body.theme-win95 #wild-modal,
+    body.theme-win95 #wild-outcome-text { background: rgba(0,0,0,0.75) !important; }
+    body.theme-win95 .wrm-card,
+    body.theme-win95 .wild-pick-card,
+    body.theme-win95 .wild-modal-card {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+      color: #000 !important;
+    }
+    body.theme-win95 .wrm-label,
+    body.theme-win95 .wild-modal-header,
+    body.theme-win95 .wild-pick-header { color: #000080 !important; }
+    body.theme-win95 .wrm-winner { color: #000080 !important; }
+    body.theme-win95 .wrm-hand,
+    body.theme-win95 .wrm-pot,
+    body.theme-win95 .wild-pick-subtitle { color: #000 !important; }
+    body.theme-win95 .wild-outcome-title { color: #000080 !important; }
+    body.theme-win95 .wild-outcome-desc  { color: #000 !important; }
+    /* Roll info */
+    body.theme-win95 .rolls-left,
+    body.theme-win95 .status-text { color: #000 !important; }
+    body.theme-win95 .pip { background: #808080 !important; }
+    body.theme-win95 .pip.active { background: #000080 !important; }
+    body.theme-win95 .free-hand-name { color: #000080 !important; }
+    body.theme-win95 .free-hand-kicker { color: #000 !important; }
+    body.theme-win95 .free-hand-prompt { color: #444 !important; font-style: normal !important; }
+    /* Held badge */
+    body.theme-win95 .die.held     .held-badge { background: #000080 !important; color: #fff !important; }
+    body.theme-win95 .die.cpu-held .held-badge { background: #800080 !important; color: #fff !important; }
+    /* Die glow effects removed in win95 */
+    body.theme-win95 .die { filter: none !important; }
+    body.theme-win95 .die.held     { transform: translateY(-4px) !important; filter: none !important; }
+    body.theme-win95 .die.cpu-held { transform: translateY(-4px) !important; filter: none !important; }
+    body.theme-win95 .die.full:hover.holdable { transform: translateY(-4px) !important; filter: none !important; }
+    /* Scoring/hand reference */
+    body.theme-win95 .scoring-table {
+      background: #d4d0c8 !important; border-color: #808080 !important; border-radius: 0 !important;
+    }
+    body.theme-win95 .scoring-table h3 { color: #000 !important; }
+    body.theme-win95 .scoring-row { color: #000 !important; }
+    body.theme-win95 .scoring-row .pts { color: #000080 !important; }
+    body.theme-win95 .shr-grid {
+      background: #d4d0c8 !important; border-color: #808080 !important; border-radius: 0 !important;
+    }
+    body.theme-win95 .shr-name { color: #000 !important; }
+    body.theme-win95 .shr-pts  { color: #000080 !important; }
+    /* Folded badge */
+    body.theme-win95 .ps-folded-badge { color: #800000 !important; border-color: #800000 !important; background: #ffc0c0 !important; }
+    /* Dealer button */
+    body.theme-win95 .dealer-btn { background: #c0c0c0 !important; border-color: #808080 !important; }
+
     /* ── Classic Mode results overlay ───────────────── */
     #free-results-overlay {
       display:none; position:fixed; inset:0; z-index:170;
@@ -711,23 +964,33 @@
     </div>
 
     <div class="settings-row">
-      <div class="settings-label">Table Colour</div>
-      <div class="swatch-group">
-        <button class="swatch active" id="sopt-table-green" onclick="setTableColour('green')" style="background:#1f6b1f" title="Green felt"></button>
-        <button class="swatch"        id="sopt-table-black" onclick="setTableColour('black')" style="background:#1e1e1e" title="Black felt"></button>
-        <button class="swatch"        id="sopt-table-red"   onclick="setTableColour('red')"   style="background:#7a1a1a" title="Red felt"></button>
-        <button class="swatch"        id="sopt-table-blue"  onclick="setTableColour('blue')"  style="background:#1a3d8b" title="Blue felt"></button>
+      <div class="settings-label">Windows 95 Mode</div>
+      <div class="sopt-group">
+        <button class="sopt active" id="sopt-win95-off" onclick="setWin95Mode(false)">Off</button>
+        <button class="sopt"        id="sopt-win95-on"  onclick="setWin95Mode(true)">On</button>
       </div>
     </div>
 
-    <div class="settings-row">
-      <div class="settings-label">Dice Colour</div>
-      <div class="swatch-group">
-        <button class="swatch active" id="sopt-dice-white" onclick="setDiceColour('white')" style="background:#f0f0f0" title="White dice"></button>
-        <button class="swatch"        id="sopt-dice-red"   onclick="setDiceColour('red')"   style="background:#cc2222" title="Red dice"></button>
-        <button class="swatch"        id="sopt-dice-blue"  onclick="setDiceColour('blue')"  style="background:#1a44cc" title="Blue dice"></button>
-        <button class="swatch"        id="sopt-dice-green" onclick="setDiceColour('green')" style="background:#1e8c3a" title="Green dice"></button>
-        <button class="swatch"        id="sopt-dice-black" onclick="setDiceColour('black')" style="background:#111111" title="Black dice"></button>
+    <div id="colour-settings">
+      <div class="settings-row">
+        <div class="settings-label">Table Colour</div>
+        <div class="swatch-group">
+          <button class="swatch active" id="sopt-table-green" onclick="setTableColour('green')" style="background:#1f6b1f" title="Green felt"></button>
+          <button class="swatch"        id="sopt-table-black" onclick="setTableColour('black')" style="background:#1e1e1e" title="Black felt"></button>
+          <button class="swatch"        id="sopt-table-red"   onclick="setTableColour('red')"   style="background:#7a1a1a" title="Red felt"></button>
+          <button class="swatch"        id="sopt-table-blue"  onclick="setTableColour('blue')"  style="background:#1a3d8b" title="Blue felt"></button>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-label">Dice Colour</div>
+        <div class="swatch-group">
+          <button class="swatch active" id="sopt-dice-white" onclick="setDiceColour('white')" style="background:#f0f0f0" title="White dice"></button>
+          <button class="swatch"        id="sopt-dice-red"   onclick="setDiceColour('red')"   style="background:#cc2222" title="Red dice"></button>
+          <button class="swatch"        id="sopt-dice-blue"  onclick="setDiceColour('blue')"  style="background:#1a44cc" title="Blue dice"></button>
+          <button class="swatch"        id="sopt-dice-green" onclick="setDiceColour('green')" style="background:#1e8c3a" title="Green dice"></button>
+          <button class="swatch"        id="sopt-dice-black" onclick="setDiceColour('black')" style="background:#111111" title="Black dice"></button>
+        </div>
       </div>
     </div>
 
@@ -1182,37 +1445,119 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
   el.className=`die ${size}${isCpuHeld?' cpu-held':isHeld?' held':''}${rolling?' rolling':''}${holdable?' holdable':''}${isWildTarget?' wild-targetable':''}`;
   if(onClick)el.onclick=onClick;
 
+  const _w95 = (typeof settings !== 'undefined') && settings.win95Mode;
+
   // Empty die: pre-roll state — plain face, no markings
   if(isEmpty){
-    const _dc = (typeof settings !== 'undefined') ? settings.diceColour : 'white';
-    const _ef = {white:'#ffffff',red:'#cc2222',green:'#1e8c3a',blue:'#1a44cc',black:'#111111'}[_dc]||'#ffffff';
-    const _es = {white:'#c8c8c8',red:'#991111',green:'#146030',blue:'#112299',black:'#555555'}[_dc]||'#c8c8c8';
-    el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="4" width="112" height="112" rx="18" fill="${_ef}" stroke="${_es}" stroke-width="1.5"/>
-      <rect x="4" y="4" width="112" height="112" rx="18" fill="url(#face-rim)" pointer-events="none"/>
-    </svg><div class="held-badge">held</div>`;
+    if(_w95){
+      el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="116" height="116" rx="2" fill="#000"/>
+        <rect x="4" y="4" width="112" height="112" rx="1" fill="#d4d0c8"/>
+        <line x1="4" y1="115" x2="4" y2="5" stroke="#fff" stroke-width="2"/>
+        <line x1="4" y1="5" x2="115" y2="5" stroke="#fff" stroke-width="2"/>
+        <line x1="6" y1="113" x2="6" y2="7" stroke="#dfdfdf" stroke-width="1.5"/>
+        <line x1="6" y1="7" x2="113" y2="7" stroke="#dfdfdf" stroke-width="1.5"/>
+        <line x1="115" y1="5" x2="115" y2="115" stroke="#808080" stroke-width="2"/>
+        <line x1="5" y1="115" x2="115" y2="115" stroke="#808080" stroke-width="2"/>
+        <line x1="113" y1="7" x2="113" y2="113" stroke="#404040" stroke-width="1.5"/>
+        <line x1="7" y1="113" x2="113" y2="113" stroke="#404040" stroke-width="1.5"/>
+      </svg><div class="held-badge">held</div>`;
+    } else {
+      const _dc = (typeof settings !== 'undefined') ? settings.diceColour : 'white';
+      const _ef = {white:'#ffffff',red:'#cc2222',green:'#1e8c3a',blue:'#1a44cc',black:'#111111'}[_dc]||'#ffffff';
+      const _es = {white:'#c8c8c8',red:'#991111',green:'#146030',blue:'#112299',black:'#555555'}[_dc]||'#c8c8c8';
+      el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="112" height="112" rx="18" fill="${_ef}" stroke="${_es}" stroke-width="1.5"/>
+        <rect x="4" y="4" width="112" height="112" rx="18" fill="url(#face-rim)" pointer-events="none"/>
+      </svg><div class="held-badge">held</div>`;
+    }
     return el;
   }
   // Blank die: hidden face shown as ?
   if(isBlank){
-    el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="4" width="112" height="112" rx="18" fill="#0d1a26" stroke="#336688" stroke-width="2"/>
-      <text x="60" y="80" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="62" fill="#4488aa">?</text>
-    </svg><div class="held-badge">held</div>`;
+    if(_w95){
+      el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="116" height="116" rx="2" fill="#000"/>
+        <rect x="4" y="4" width="112" height="112" rx="1" fill="#c8d4fc"/>
+        <line x1="4" y1="115" x2="4" y2="5" stroke="#808080" stroke-width="2"/>
+        <line x1="4" y1="5" x2="115" y2="5" stroke="#808080" stroke-width="2"/>
+        <line x1="115" y1="5" x2="115" y2="115" stroke="#fff" stroke-width="2"/>
+        <line x1="5" y1="115" x2="115" y2="115" stroke="#fff" stroke-width="2"/>
+        <text x="60" y="80" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="62" fill="#000080">?</text>
+      </svg><div class="held-badge">held</div>`;
+    } else {
+      el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="112" height="112" rx="18" fill="#0d1a26" stroke="#336688" stroke-width="2"/>
+        <text x="60" y="80" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="62" fill="#4488aa">?</text>
+      </svg><div class="held-badge">held</div>`;
+    }
     return el;
   }
   // Locked die: forced to 9, greyed out, unchoosable
   if(isLocked){
-    el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="4" width="112" height="112" rx="18" fill="#222" stroke="#444" stroke-width="2"/>
-      <text x="60" y="74" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="62" fill="#555">9</text>
-      <line x1="28" y1="28" x2="92" y2="92" stroke="#cc3333" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
-      <line x1="92" y1="28" x2="28" y2="92" stroke="#cc3333" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
-    </svg><div class="held-badge">held</div>`;
+    if(_w95){
+      el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="116" height="116" rx="2" fill="#000"/>
+        <rect x="4" y="4" width="112" height="112" rx="1" fill="#a8a8a8"/>
+        <line x1="4" y1="115" x2="4" y2="5" stroke="#808080" stroke-width="2"/>
+        <line x1="4" y1="5" x2="115" y2="5" stroke="#808080" stroke-width="2"/>
+        <line x1="115" y1="5" x2="115" y2="115" stroke="#fff" stroke-width="2"/>
+        <line x1="5" y1="115" x2="115" y2="115" stroke="#fff" stroke-width="2"/>
+        <text x="60" y="74" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="62" fill="#606060">9</text>
+        <line x1="28" y1="28" x2="92" y2="92" stroke="#cc3333" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="92" y1="28" x2="28" y2="92" stroke="#cc3333" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+      </svg><div class="held-badge">held</div>`;
+    } else {
+      el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="4" width="112" height="112" rx="18" fill="#222" stroke="#444" stroke-width="2"/>
+        <text x="60" y="74" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="62" fill="#555">9</text>
+        <line x1="28" y1="28" x2="92" y2="92" stroke="#cc3333" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="92" y1="28" x2="28" y2="92" stroke="#cc3333" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+      </svg><div class="held-badge">held</div>`;
+    }
     return el;
   }
 
   const isMini=(size==='mini');
+
+  // ── Win95 die rendering ─────────────────────────────
+  if(typeof settings !== 'undefined' && settings.win95Mode){
+    const w95fill = isRevealed ? '#c8d4fc' : isCpuHeld ? '#e8c8f8' : isHeld ? '#c8d8fc' : '#d4d0c8';
+    // Raised: white top-left, grey bottom-right. Sunken: reversed (for held/selected)
+    const isSelected = isHeld || isCpuHeld || isRevealed;
+    const tl  = isSelected ? '#808080' : '#ffffff';
+    const tl2 = isSelected ? '#404040' : '#dfdfdf';
+    const br  = isSelected ? '#ffffff' : '#808080';
+    const br2 = isSelected ? '#dfdfdf' : '#404040';
+    const w95border = isRevealed ? '#000080' : isCpuHeld ? '#800080' : '#000000';
+    const w95fontSize = isMini ? (face==='10'?26:34) : (face==='10'?50:62);
+    const lsW95 = face==='10' ? ' letter-spacing="-3"' : '';
+    let w95text = '';
+    if(face){
+      w95text = `<text x="60" y="74" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="${w95fontSize}"${lsW95} fill="#000000">${face}</text>`;
+      if(!isMini){
+        const cfs = face==='10' ? 13 : 16;
+        const cls = face==='10' ? ' letter-spacing="-1"' : '';
+        w95text += `
+        <text x="12" y="28" text-anchor="start" font-family="Arial,sans-serif" font-weight="700" font-size="${cfs}"${cls} fill="#444444">${face}</text>
+        <g transform="rotate(180,60,60)"><text x="12" y="28" text-anchor="start" font-family="Arial,sans-serif" font-weight="700" font-size="${cfs}"${cls} fill="#444444">${face}</text></g>`;
+      }
+    }
+    el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="116" height="116" rx="2" fill="${w95border}"/>
+      <rect x="4" y="4" width="112" height="112" rx="1" fill="${w95fill}"/>
+      <line x1="4" y1="115" x2="4" y2="5"   stroke="${tl}"  stroke-width="2"/>
+      <line x1="4" y1="5"   x2="115" y2="5"  stroke="${tl}"  stroke-width="2"/>
+      <line x1="6" y1="113" x2="6"   y2="7"  stroke="${tl2}" stroke-width="1.5"/>
+      <line x1="6" y1="7"   x2="113" y2="7"  stroke="${tl2}" stroke-width="1.5"/>
+      <line x1="115" y1="5"   x2="115" y2="115" stroke="${br}"  stroke-width="2"/>
+      <line x1="5"   y1="115" x2="115" y2="115" stroke="${br}"  stroke-width="2"/>
+      <line x1="113" y1="7"   x2="113" y2="113" stroke="${br2}" stroke-width="1.5"/>
+      <line x1="7"   y1="113" x2="113" y2="113" stroke="${br2}" stroke-width="1.5"/>
+      ${w95text}
+    </svg><div class="held-badge">held</div>`;
+    return el;
+  }
 
   // State → face fill and border stroke
   const dc = (typeof settings !== 'undefined') ? settings.diceColour : 'white';
@@ -2569,15 +2914,23 @@ let shakeEnabled = false;
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 const SETTINGS_KEY = 'pokerDiceSettings';
-const settings = Object.assign({ tableColour: 'green', diceColour: 'white', shakeMode: false },
+const settings = Object.assign({ tableColour: 'green', diceColour: 'white', shakeMode: false, win95Mode: false },
   JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
 
 function saveSettings(){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
 
 function applySettings(){
-  // Table theme — remove all, apply current
+  // Win95 mode overrides everything
+  const w95 = settings.win95Mode;
+  document.body.classList.toggle('theme-win95', w95);
+  document.documentElement.classList.toggle('theme-win95', w95);
+  // Win95 toggle buttons
+  document.getElementById('sopt-win95-off')?.classList.toggle('active', !w95);
+  document.getElementById('sopt-win95-on')?.classList.toggle('active',  w95);
+
+  // Table theme — remove all, apply current (only when not in win95)
   ['black','red','blue'].forEach(t=>{ document.body.classList.remove(`theme-${t}`); document.documentElement.classList.remove(`theme-${t}`); });
-  if(settings.tableColour!=='green'){
+  if(!w95 && settings.tableColour!=='green'){
     document.body.classList.add(`theme-${settings.tableColour}`);
     document.documentElement.classList.add(`theme-${settings.tableColour}`);
   }
@@ -2594,6 +2947,14 @@ function applySettings(){
   });
   document.getElementById('sopt-shake-off')?.classList.toggle('active', !settings.shakeMode);
   document.getElementById('sopt-shake-on')?.classList.toggle('active',  settings.shakeMode);
+  // Re-render dice if active (win95 changes die appearance)
+  try{
+    if(typeof gameMode!=='undefined'){
+      if(gameMode==='free'&&typeof freeRenderTray==='function') freeRenderTray();
+      else if(typeof renderTray==='function'&&typeof dice!=='undefined'&&typeof held!=='undefined')
+        renderTray('dice-tray',dice,held,typeof wildRenderOpts==='function'?wildRenderOpts():{});
+    }
+  }catch(e){}
 }
 
 function openSettings(){ document.getElementById('settings-modal').classList.add('visible'); }
@@ -2618,6 +2979,10 @@ function setShakeMode(enable){
   } else {
     settings.shakeMode=false; shakeEnabled=false; saveSettings(); applySettings();
   }
+}
+
+function setWin95Mode(enable){
+  settings.win95Mode = enable; saveSettings(); applySettings();
 }
 
 // Legacy stub — no longer used but kept in case of stale references
