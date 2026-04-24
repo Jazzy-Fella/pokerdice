@@ -1318,12 +1318,12 @@
 
 <script>
 // Prevent double-tap from shifting the viewport on iOS Safari
-// Allow rapid taps only on the roll buttons
+// Allow rapid taps on roll buttons and dice (holding multiple dice in quick succession)
 ;(()=>{
   let last=0;
   document.addEventListener('touchend',e=>{
     const now=Date.now();
-    if(now-last<300 && !e.target.closest('#btn-roll,#free-roll-btn.btn-roll'))
+    if(now-last<300 && !e.target.closest('#btn-roll,#free-roll-btn,.die'))
       e.preventDefault();
     last=now;
   },{passive:false});
