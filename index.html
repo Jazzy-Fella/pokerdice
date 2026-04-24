@@ -328,6 +328,8 @@
       color: #ffd700; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 0.75rem;
       padding: 6px 14px; border-radius: 20px; cursor: pointer; letter-spacing: 0.05em;
       transition: border-color 0.2s, background 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      min-width: 44px;
     }
     #hands-btn:hover { border-color: rgba(255,215,0,0.7); background: rgba(0,0,0,0.75); }
     #hands-modal {
@@ -379,7 +381,7 @@
     .htp-turn-text { font-size: 0.78rem; color: #c8dfc8; line-height: 1.7; }
 
     /* ── Scoreboard hand name ────────────────────── */
-    .ps-hand { font-size: 0.6rem; color: #88cc88; margin-top: 2px; font-style: italic; line-height: 1.4; min-height: 2.8em; }
+    .ps-hand { font-size: 0.6rem; color: #88cc88; margin-top: 2px; font-style: italic; line-height: 1.4; height: 2.8em; overflow: hidden; }
     .ps-hand-kicker { }
 
     /* ── Dealer button ──────────────────────────── */
@@ -2147,7 +2149,9 @@ function startTurn(idx){
     setBanner(`${p.name}'s Turn`,'cpu-turn');setStatus('Thinking…');
     setTimeout(cpuDoRoll,CPU_THINK);
   } else {
-    setBanner(`${p.name}'s Turn — Roll the Dice!`,'human-turn');setStatus('Click Roll to start your turn');setRollBtns(true,false);
+    setBanner(`${p.name}'s Turn — Roll the Dice!`,'human-turn');setStatus('Click Roll to start your turn');
+    document.getElementById('btn-bank').textContent='Bank Hand';
+    setRollBtns(true,false);
   }
 }
 function cpuDoRoll(){
@@ -2273,6 +2277,11 @@ function _settleShake(trayId,isFree){
     else setStatus(rollsLeft===0?'No rolls left — bank your hand!':rollsLeft===1?'Last roll!':'Hold dice to keep, then shake again or bank');
     document.getElementById('btn-roll').textContent='Shake & Roll';
     setRollBtns(canRoll,true);
+    if(!canRoll){
+      const nextIdx=findNextUnbanked(currentPlayerIdx);
+      const bankBtn=document.getElementById('btn-bank');
+      if(nextIdx!==-1) bankBtn.textContent=`Pass to ${players[nextIdx].name} →`;
+    }
   }
 }
 function playerBank(){
@@ -2581,9 +2590,11 @@ function cpuBettingAction(idx){
     return;
   }
   if(toCall>bal*0.5&&bal>MIN_ANTE){
-    // Expensive call — fold ~60% of the time (only if not short-stacked)
+    // Expensive call — fold probability scales with how much of stack is at risk
+    // Near all-in: rarely fold (25%); moderately expensive: fold 40%
+    const foldChance=toCall>=bal*0.9?0.25:0.40;
     setStatus('Considering…');
-    setTimeout(()=>Math.random()<0.6?doFold(idx):doCall(idx),CPU_THINK);
+    setTimeout(()=>Math.random()<foldChance?doFold(idx):doCall(idx),CPU_THINK);
     return;
   }
   // Occasionally raise (15%) if no one has raised yet and they can afford it
