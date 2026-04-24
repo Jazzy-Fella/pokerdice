@@ -556,6 +556,9 @@
         radial-gradient(ellipse at top, #1a6b3a 0%, #0d3d20 60%, #081f10 100%);
       align-items:center; justify-content:center;
     }
+    body.theme-black #free-results-overlay { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.10'/%3E%3C/svg%3E"), radial-gradient(ellipse at top, #222222 0%, #111111 60%, #050505 100%); }
+    body.theme-red   #free-results-overlay { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.14'/%3E%3C/svg%3E"), radial-gradient(ellipse at top, #8b1a1a 0%, #4d0d0d 60%, #1f0808 100%); }
+    body.theme-blue  #free-results-overlay { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.14'/%3E%3C/svg%3E"), radial-gradient(ellipse at top, #1a3d8b 0%, #0d1f4d 60%, #08101f 100%); }
     #free-results-overlay.visible { display:flex; }
     .fr-card {
       background:linear-gradient(160deg,#0a1f0e,#061409);
@@ -564,6 +567,9 @@
       align-items:center; gap:8px; min-width:280px; max-width:340px;
       box-shadow:0 8px 40px rgba(255,215,0,0.25);
     }
+    body.theme-black .fr-card { background: linear-gradient(160deg,#1a1a1a,#0a0a0a); }
+    body.theme-red   .fr-card { background: linear-gradient(160deg,#4d1010,#2a0808); }
+    body.theme-blue  .fr-card { background: linear-gradient(160deg,#0d1f4d,#070f28); }
     .fr-trophy { font-size:2.4rem; line-height:1; }
     .fr-title { font-size:0.6rem; text-transform:uppercase; letter-spacing:0.18em; color:#a8c8a0; }
     .fr-winner { font-size:1.5rem; color:#ffd700; font-weight:bold; text-align:center; line-height:1.2; margin-top:2px; }
@@ -629,6 +635,9 @@
       border-radius: 20px; padding: 34px 32px; text-align: center;
       max-width: 440px; width: 92%; box-shadow: 0 20px 60px rgba(0,0,0,0.9);
     }
+    body.theme-black .overlay-card { background: linear-gradient(160deg,#1e1e1e,#0a0a0a); }
+    body.theme-red   .overlay-card { background: linear-gradient(160deg,#5c1a1a,#3d0d0d); }
+    body.theme-blue  .overlay-card { background: linear-gradient(160deg,#1a3060,#0d1840); }
     .overlay-card h2 { font-size: 1.7rem; color: #ffd700; margin-bottom: 18px; }
     .final-scores { display: flex; border-radius: 10px; overflow: hidden; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.1); }
     .fsc { flex: 1; padding: 12px 6px; background: rgba(0,0,0,0.3); text-align: center; min-width: 0; }
