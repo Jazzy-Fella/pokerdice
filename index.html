@@ -862,6 +862,55 @@
       transform: translateX(-50%) !important;
     }
 
+    /* Disabled roll button — no raised box outline during CPU turn */
+    body.theme-win95 .btn:disabled,
+    body.theme-win95 #btn-roll:disabled,
+    body.theme-win95 #free-roll-btn:disabled {
+      box-shadow: none !important;
+      border: 1px solid #808080 !important;
+    }
+    /* Bet contribution text under player balance */
+    body.theme-win95 .ps-bet-contrib { color: #444 !important; }
+    /* Active player card — override inline gold glow */
+    body.theme-win95 .ps.active-turn {
+      background: rgba(0,0,128,0.12) !important;
+      box-shadow: inset 0 0 0 2px #000080 !important;
+    }
+    body.theme-win95 .ps .ps-label { color: #000 !important; }
+    body.theme-win95 .ps .ps-value { color: #000080 !important; }
+    /* Below-strip pot amount */
+    body.theme-win95 #below-strip { color: #000 !important; }
+    body.theme-win95 #below-strip span { color: #000080 !important; font-weight: bold !important; }
+    /* Turn banner — remove gradient */
+    body.theme-win95 .turn-banner,
+    body.theme-win95 .turn-banner.human-turn,
+    body.theme-win95 .turn-banner.cpu-turn {
+      background: #c0c0c0 !important;
+      color: #000080 !important;
+      border-top: 2px solid #808080 !important;
+      border-bottom: 2px solid #808080 !important;
+      text-shadow: none !important;
+    }
+    /* Player status badges */
+    body.theme-win95 .bsb { border-radius: 0 !important; }
+    body.theme-win95 .bsb-wait  { background: #c0c0c0 !important; color: #000 !important; border: 1px solid #808080 !important; }
+    body.theme-win95 .bsb-fold  { background: #ffc0c0 !important; color: #800000 !important; border: 1px solid #800000 !important; }
+    body.theme-win95 .bsb-act   { background: #c0ffc0 !important; color: #006400 !important; border: 1px solid #006400 !important; }
+    body.theme-win95 .bsb-raise { background: #ffffc0 !important; color: #808000 !important; border: 1px solid #808000 !important; }
+    /* Raise section labels */
+    body.theme-win95 .raise-label  { color: #000 !important; }
+    body.theme-win95 .raise-amount { color: #000080 !important; }
+    /* Chip / raise buttons */
+    body.theme-win95 .chip {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      color: #000 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .chip:disabled { opacity: 0.5 !important; box-shadow: none !important; border: 1px solid #808080 !important; }
+    body.theme-win95 .chip:active:not(:disabled) {
+      box-shadow: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf !important;
+    }
+
     /* ── Classic Mode results overlay ───────────────── */
     #free-results-overlay {
       display:none; position:fixed; inset:0; z-index:170;
