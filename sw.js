@@ -1,4 +1,4 @@
-const CACHE = 'poker-dice-v2';
+const CACHE = 'poker-dice-v3';
 const ASSETS = [
   '/',
   '/index.html',
@@ -6,7 +6,7 @@ const ASSETS = [
   '/icon-192.png',
   '/icon-512.png',
   '/apple-touch-icon.png',
-  '/RetroSigned.ttf'
+  '/LoungeBait.ttf'
 ];
 
 self.addEventListener('install', e => {
