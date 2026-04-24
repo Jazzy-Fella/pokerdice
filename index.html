@@ -453,7 +453,7 @@
       font-size: 0.72rem; opacity: 0.6;
       z-index: 10;
     }
-    #free-change-mode-btn:hover, #game-change-mode-btn:hover { opacity: 1; }
+    #free-change-mode-btn:hover, #game-change-mode-btn:hover { opacity: 1; transform: translateX(-50%) !important; }
     /* ── Settings cog ───────────────────────────────── */
     #settings-cog {
       position: fixed; top: calc(env(safe-area-inset-top) + 10px); left: 16px; z-index: 50;
@@ -800,6 +800,62 @@
     body.theme-win95 .ps-folded-badge { color: #800000 !important; border-color: #800000 !important; background: #ffc0c0 !important; }
     /* Dealer button */
     body.theme-win95 .dealer-btn { background: #c0c0c0 !important; border-color: #808080 !important; }
+    /* Setup screen buttons */
+    body.theme-win95 .btn-setup {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      color: #000 !important; font-size: 1rem !important; box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+      transform: none !important; text-shadow: none !important; letter-spacing: 0 !important;
+    }
+    body.theme-win95 .btn-setup:hover {
+      transform: none !important; box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .btn-setup:active {
+      box-shadow: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf !important;
+    }
+    body.theme-win95 .btn-add-player,
+    body.theme-win95 .btn-remove-player {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      color: #000 !important; opacity: 1 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .btn-add-player:hover:not(:disabled),
+    body.theme-win95 .btn-remove-player:hover:not(:disabled) {
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+      color: #000 !important;
+    }
+    body.theme-win95 .btn-add-player:disabled,
+    body.theme-win95 .btn-remove-player:disabled { opacity: 0.45 !important; }
+    body.theme-win95 .type-toggle {
+      border: none !important; border-radius: 0 !important; overflow: visible !important;
+      gap: 4px !important;
+    }
+    body.theme-win95 .type-btn {
+      background: #c0c0c0 !important; color: #000 !important; border-radius: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 .type-btn.active {
+      background: #c0c0c0 !important; color: #000 !important;
+      box-shadow: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf !important;
+    }
+    /* Change Mode button — no hover jump, no opacity fade */
+    body.theme-win95 #free-change-mode-btn,
+    body.theme-win95 #game-change-mode-btn {
+      background: #c0c0c0 !important; border: none !important; border-radius: 0 !important;
+      color: #000 !important; opacity: 1 !important; letter-spacing: 0 !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+      transform: translateX(-50%) !important;
+      transition: none !important;
+    }
+    body.theme-win95 #free-change-mode-btn:hover,
+    body.theme-win95 #game-change-mode-btn:hover {
+      opacity: 1 !important; transform: translateX(-50%) !important;
+      box-shadow: inset -1px -1px #000, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf !important;
+    }
+    body.theme-win95 #free-change-mode-btn:active,
+    body.theme-win95 #game-change-mode-btn:active {
+      box-shadow: inset 1px 1px #000, inset -1px -1px #fff, inset 2px 2px #808080, inset -2px -2px #dfdfdf !important;
+      transform: translateX(-50%) !important;
+    }
 
     /* ── Classic Mode results overlay ───────────────── */
     #free-results-overlay {
@@ -963,14 +1019,6 @@
       <button class="settings-close" onclick="closeSettings()">✕</button>
     </div>
 
-    <div class="settings-row">
-      <div class="settings-label">Windows 95 Mode</div>
-      <div class="sopt-group">
-        <button class="sopt active" id="sopt-win95-off" onclick="setWin95Mode(false)">Off</button>
-        <button class="sopt"        id="sopt-win95-on"  onclick="setWin95Mode(true)">On</button>
-      </div>
-    </div>
-
     <div id="colour-settings">
       <div class="settings-row">
         <div class="settings-label">Table Colour</div>
@@ -991,6 +1039,14 @@
           <button class="swatch"        id="sopt-dice-green" onclick="setDiceColour('green')" style="background:#1e8c3a" title="Green dice"></button>
           <button class="swatch"        id="sopt-dice-black" onclick="setDiceColour('black')" style="background:#111111" title="Black dice"></button>
         </div>
+      </div>
+    </div>
+
+    <div class="settings-row">
+      <div class="settings-label">Windows 95 Mode</div>
+      <div class="sopt-group">
+        <button class="sopt active" id="sopt-win95-off" onclick="setWin95Mode(false)">Off</button>
+        <button class="sopt"        id="sopt-win95-on"  onclick="setWin95Mode(true)">On</button>
       </div>
     </div>
 
