@@ -1852,8 +1852,26 @@ function freeRenderScoreboard(){
   const multi=players&&players.length>1;
   sb.style.display=multi?'flex':'none';
   if(!multi)return;
-  sb.innerHTML='';
   const allDone=freeResults.length>=players.length;
+  // Update in-place if cards already exist — avoids innerHTML='' collapsing
+  // the scoreboard height and causing the table below to jump.
+  const existing=sb.querySelectorAll('.ps');
+  if(existing.length===players.length){
+    players.forEach((p,i)=>{
+      const isActive=!allDone&&i===freePlayerIdx;
+      const col=existing[i];
+      col.className='ps'+(isActive?' active-turn':'');
+      col.style.background=isActive?PLAYER_BG[i]:'';
+      col.style.boxShadow=isActive?`inset 0 0 0 2px ${PLAYER_GLOW[i]}`:'';
+      const result=freeResults.find(r=>r.playerIdx===i);
+      const handHtml=result?(result.hand.kicker?result.hand.name+'<br>'+result.hand.kicker:result.hand.name):'';
+      const handEl=document.getElementById(`free-ps-hand-${i}`);
+      if(handEl)handEl.innerHTML=handHtml;
+    });
+    return;
+  }
+  // First render or player count changed — build from scratch
+  sb.innerHTML='';
   players.forEach((p,i)=>{
     const isActive=!allDone&&i===freePlayerIdx;
     const result=freeResults.find(r=>r.playerIdx===i);
