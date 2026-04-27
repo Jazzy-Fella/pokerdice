@@ -38,7 +38,7 @@
       padding: calc(env(safe-area-inset-top) + 52px) 16px calc(env(safe-area-inset-bottom) + 6px);
       color: #f0e6c8;
     }
-    h1 { font-size: 4.8rem; font-weight: normal; letter-spacing: 0.05em; text-shadow: 0 2px 16px rgba(0,0,0,0.7); margin-bottom: 12px; color: #ffd700; text-align: center; font-family: 'LoungeBait', 'Cormorant Garamond', serif; }
+    h1 { font-size: clamp(4.8rem, 18vw, 8rem); font-weight: normal; letter-spacing: 0.05em; text-shadow: 0 2px 16px rgba(0,0,0,0.7); margin-bottom: 12px; color: #ffd700; text-align: center; font-family: 'LoungeBait', 'Cormorant Garamond', serif; white-space: nowrap; }
     .subtitle { font-size: 0.82rem; color: #a8c8a0; margin-bottom: 20px; }
 
     /* ── Mode select ─────────────────────────────── */
@@ -1124,6 +1124,14 @@
         <button class="sopt active" id="sopt-sfx-on"  onclick="setSfxEnabled(true)">On</button>
       </div>
     </div>
+
+    <div class="settings-row">
+      <div class="settings-label">Music</div>
+      <div class="sopt-group">
+        <button class="sopt"        id="sopt-music-off" onclick="setMusicEnabled(false)">Off</button>
+        <button class="sopt active" id="sopt-music-on"  onclick="setMusicEnabled(true)">On</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1946,6 +1954,7 @@ function freeCpuTurn(){
   dice=dice.map((f,i)=>held[i]?f:FACES[Math.floor(Math.random()*6)]);
   // Decide which dice to hold
   held=cpuDecideHold(dice,rollsLeft);
+  if(held.some(Boolean)) playClickSound(_holdBuffer, 0.4);
   freeRenderTray();freeUpdateHand();
   document.getElementById('free-rolls-text').textContent=rollsLeft===1?'1 roll remaining':`${rollsLeft} rolls remaining`;
   for(let i=0;i<3;i++)document.getElementById(`free-pip-${i}`).className='pip'+(i<rollsLeft?' active':'');
@@ -1973,6 +1982,7 @@ function freeRoll(){
 }
 function freeToggleHold(i){
   if(!hasRolled||rollsLeft===0)return;
+  playClickSound(_holdBuffer, 0.4);
   held[i]=!held[i];
   freeRenderTray();
 }
@@ -2050,12 +2060,15 @@ function freeShowResults(){
     list.appendChild(row);
   });
   overlay.classList.add('visible');
+  playWinSound(); // Classic mode always celebrates — no loss state here
 }
 function freePlayAgain(){
+  stopFireworks();
   document.getElementById('free-results-overlay').classList.remove('visible');
   initFreeMode();
 }
 function freeQuit(){
+  stopFireworks();
   document.getElementById('free-results-overlay').classList.remove('visible');
   goToModeSelect();
 }
@@ -2076,7 +2089,6 @@ function freeUpdateHand(){
 function selectMode(mode){
   gameMode=mode;
   document.getElementById('mode-select').style.display='none';
-  document.getElementById('settings-cog').style.display='none';
   const modeTitle=mode==='score'?'🎯 Score Mode':mode==='wild'?'🃏 Wild Mode':mode==='free'?'🎲 Classic Mode':'💰 Betting Mode';
   document.getElementById('setup-title').textContent=modeTitle+' — Players';
   renderSetupRows();
@@ -2129,6 +2141,7 @@ function startGame(){
   if(gameMode==='score')initScoreMode();else if(gameMode==='wild')initWildMode();else initBetMode();
 }
 function goToModeSelect(){
+  stopFireworks();
   _releaseWakeLock();
   clearShake();
   document.activeElement?.blur();
@@ -2200,7 +2213,9 @@ function cpuDoRoll(){
   if(rollsLeft===0){cpuBankCurrent();return;}
   rollsLeft--;hasRolled=true;setStatus('Rolling…');
   animateRoll(true,()=>{
-    held=cpuDecideHold(dice,rollsLeft);renderTray('dice-tray',dice,held,{isCpu:true,...wildRenderOpts()});
+    held=cpuDecideHold(dice,rollsLeft);
+    if(held.some(Boolean)) playClickSound(_holdBuffer, 0.4);
+    renderTray('dice-tray',dice,held,{isCpu:true,...wildRenderOpts()});
     const h=evalHand(dice);setHandDisplay(h.name,h.pts,true);renderRollsLeft();
     const hc=held.filter(Boolean).length;
     if(wildCharge){
@@ -2261,6 +2276,7 @@ function bankHand(idx,hand,diceArr){
 function toggleHold(i){
   if(!hasRolled||rollsLeft===0||currentTurn!=='human')return;
   if(i===wildLockedDieIdx)return; // locked die can't be held
+  playClickSound(_holdBuffer, 0.4);
   if(wildCharge){wildPickDie(i);return;} // use wild charge
   held[i]=!held[i];
   const wOpts=wildRenderOpts();
@@ -2272,7 +2288,7 @@ function clearShake(){
   shakeActive=false;
 }
 // ── Web Audio roll sound ─────────────────────────────────────────
-let _audioCtx=null, _rollBuffer=null, _clickBuffer=null, _toggleBuffer=null, _chipBuffer=null, _rollSource=null, _rollPending=false;
+let _audioCtx=null, _rollBuffer=null, _clickBuffer=null, _toggleBuffer=null, _chipBuffer=null, _holdBuffer=null, _winBuffer=null, _loseBuffer=null, _rollSource=null, _rollPending=false;
 function _initAudio(){
   if(_audioCtx)return;
   try{ _audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){return;}
@@ -2281,6 +2297,9 @@ function _initAudio(){
   load('/btn-click.wav',   decoded=>{ _clickBuffer=decoded; });
   load('/btn-toggle.wav',  decoded=>{ _toggleBuffer=decoded; });
   load('/btn-chip.wav',    decoded=>{ _chipBuffer=decoded; });
+  load('/dice-hold.wav',   decoded=>{ _holdBuffer=decoded; });
+  load('/win.wav',         decoded=>{ _winBuffer=decoded; });
+  load('/lose.wav',        decoded=>{ _loseBuffer=decoded; });
 }
 function _doPlayRoll(){
   if(!_audioCtx||!_rollBuffer)return;
@@ -2300,16 +2319,108 @@ function playRollSound(){
 function stopRollSound(){
   if(_rollSource){try{_rollSource.stop();}catch(e){} _rollSource=null;}
 }
-function playClickSound(buffer){
+function playClickSound(buffer, gain=1){
   if(!settings.sfxEnabled||!_audioCtx||!buffer)return;
   const wasSuspended=_audioCtx.state==='suspended';
   if(wasSuspended) _audioCtx.resume();
   const src=_audioCtx.createBufferSource();
   src.buffer=buffer;
-  src.connect(_audioCtx.destination);
+  if(gain!==1){
+    const g=_audioCtx.createGain(); g.gain.value=gain;
+    src.connect(g); g.connect(_audioCtx.destination);
+  } else {
+    src.connect(_audioCtx.destination);
+  }
   // If context was suspended, schedule 20ms ahead so hardware finishes spinning up before sound plays.
   // All subsequent clicks use start(0) = instant.
   src.start(wasSuspended ? _audioCtx.currentTime+0.02 : 0);
+}
+function playWinSound(){  playClickSound(_winBuffer,  0.6); launchFireworks(); }
+function playLoseSound(){ playClickSound(_loseBuffer, 0.6); }
+
+// ── Fireworks ────────────────────────────────────────────────────────────────
+let _fwCanvas=null,_fwCtx=null,_fwAnim=null,_fwParticles=[],_fwLaunchTimer=null;
+function _initFwCanvas(){
+  if(_fwCanvas)return;
+  _fwCanvas=document.createElement('canvas');
+  _fwCanvas.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:500;';
+  document.body.appendChild(_fwCanvas);
+  _fwCtx=_fwCanvas.getContext('2d');
+}
+function _fwResize(){ _fwCanvas.width=window.innerWidth; _fwCanvas.height=window.innerHeight; }
+function _fwBurst(){
+  const w=_fwCanvas.width, h=_fwCanvas.height;
+  const x=w*(0.15+Math.random()*0.70);
+  const y=h*(0.08+Math.random()*0.45);
+  const PALETTES=[
+    ['#ffd700','#ffec6e','#fff4b0'],   // gold
+    ['#ff6b6b','#ff9f43','#ffd700'],   // warm
+    ['#a29bfe','#fd79a8','#ffeaa7'],   // pastel
+    ['#00cec9','#55efc4','#dfe6e9'],   // cool
+  ];
+  const pal=PALETTES[Math.floor(Math.random()*PALETTES.length)];
+  const count=45+Math.floor(Math.random()*20);
+  for(let i=0;i<count;i++){
+    const angle=(Math.PI*2*i)/count + (Math.random()-0.5)*0.3;
+    const speed=1.8+Math.random()*3.5;
+    _fwParticles.push({
+      x,y,
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed - 0.5,
+      life:1.0,
+      decay:0.010+Math.random()*0.012,
+      color:pal[Math.floor(Math.random()*pal.length)],
+      size:1.8+Math.random()*2.2,
+      trail:[]
+    });
+  }
+  // A few glitter sparks shoot further
+  for(let i=0;i<8;i++){
+    const angle=Math.random()*Math.PI*2;
+    const speed=4+Math.random()*3;
+    _fwParticles.push({
+      x,y,
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed-1,
+      life:1.0, decay:0.018+Math.random()*0.010,
+      color:'#ffffff', size:1.2, trail:[]
+    });
+  }
+}
+function launchFireworks(){
+  _initFwCanvas(); _fwResize(); _fwParticles=[];
+  if(_fwAnim)cancelAnimationFrame(_fwAnim);
+  if(_fwLaunchTimer)clearTimeout(_fwLaunchTimer);
+  // Stagger 6 bursts over ~2.5 seconds
+  const delays=[0,280,580,950,1350,1800];
+  delays.forEach(d=>{ _fwLaunchTimer=setTimeout(_fwBurst, d); });
+  const endTime=Date.now()+4200;
+  function tick(){
+    const w=_fwCanvas.width, h=_fwCanvas.height;
+    _fwCtx.clearRect(0,0,w,h);
+    _fwParticles=_fwParticles.filter(p=>p.life>0);
+    for(const p of _fwParticles){
+      p.vy+=0.055; p.vx*=0.982; p.vy*=0.982;
+      p.x+=p.vx; p.y+=p.vy;
+      p.life-=p.decay;
+      const a=Math.max(0,p.life);
+      _fwCtx.globalAlpha=a;
+      _fwCtx.fillStyle=p.color;
+      _fwCtx.beginPath();
+      _fwCtx.arc(p.x,p.y,p.size*Math.max(0.3,p.life),0,Math.PI*2);
+      _fwCtx.fill();
+    }
+    _fwCtx.globalAlpha=1;
+    if(Date.now()<endTime||_fwParticles.length>0) _fwAnim=requestAnimationFrame(tick);
+    else _fwCtx.clearRect(0,0,w,h);
+  }
+  _fwAnim=requestAnimationFrame(tick);
+}
+function stopFireworks(){
+  if(_fwAnim){cancelAnimationFrame(_fwAnim);_fwAnim=null;}
+  if(_fwLaunchTimer){clearTimeout(_fwLaunchTimer);_fwLaunchTimer=null;}
+  if(_fwCanvas&&_fwCtx)_fwCtx.clearRect(0,0,_fwCanvas.width,_fwCanvas.height);
+  _fwParticles=[];
 }
 // Pre-load audio as early as possible so buffer is ready before first roll
 _initAudio();
@@ -2319,12 +2430,13 @@ _initAudio();
 );
 // Delegated pointerdown handler — fires the instant finger touches down, zero perceived delay
 document.addEventListener('pointerdown', e=>{
-  const btn=e.target.closest('.btn,.btn-mode,.btn-setup,.sopt,.swatch,.chip,.mode-card,.settings-close');
+  const btn=e.target.closest('.btn,.btn-mode,.btn-setup,.sopt,.swatch,.chip,.mode-card,.settings-close,.type-btn,.btn-add-player,.btn-remove-player,#settings-cog,#hands-btn');
   if(!btn)return;
   if(btn.id==='btn-roll'||btn.id==='free-roll-btn')return; // roll buttons have dice sound
-  const isToggle=btn.classList.contains('sopt');
+  const isToggle=btn.classList.contains('sopt')||btn.classList.contains('type-btn');
   const isChip=btn.classList.contains('chip');
-  playClickSound(isChip ? _chipBuffer : isToggle ? _toggleBuffer : _clickBuffer);
+  const isPlayerAdd=btn.classList.contains('btn-add-player')||btn.classList.contains('btn-remove-player');
+  playClickSound(isChip ? _chipBuffer : (isToggle||isPlayerAdd) ? _toggleBuffer : _clickBuffer, 0.6);
 }, true);
 function playerShakeRoll(){
   if(currentTurn!=='human')return;
@@ -2430,6 +2542,8 @@ function scoreShowGameOver(){
   if(winners.length>1){wl.textContent="It's a Tie!";wl.className='final-winner-label tie';sub.textContent=`Tied at ${maxPts} points`;}
   else{wl.textContent=`${players[winners[0]].name} Wins!`;wl.className='final-winner-label';sub.textContent=`${players[winners[0]].name} scored ${maxPts} points`;}
   document.getElementById('overlay').classList.add('visible');
+  const humanIdx=players.findIndex(p=>p.isHuman);
+  if(winners.includes(humanIdx)) playWinSound(); else playLoseSound();
 }
 
 // ── BET MODE — Betting round ──────────────────────────────────────────────────
@@ -2730,21 +2844,57 @@ function betStartRollingPhase(){
 
 // ── Bet resolve ───────────────────────────────────────────────────────────────
 function betResolveRound(){
-  const maxPts=Math.max(...bankedThisRound.map(b=>handScore(b.hand)));
-  const winners=bankedThisRound.filter(b=>handScore(b.hand)===maxPts);
-  const share=Math.floor(pot/winners.length);
-  const rem=pot-(share*winners.length);
-  winners.forEach((w,wi)=>{pState[w.idx].bal+=share+(wi<rem?1:0);});
+  // Side-pot calculation: a player can only win up to their contribution × number
+  // of players who contributed at least that much. Excess returns to the deeper stack.
+  //
+  // Build all-contributors list (includes folded — their money stays in pot but they can't win)
+  const allIn = players.map((_,i)=>({
+    idx:i,
+    contrib: bContrib[i]||0,
+    canWin: !!bankedThisRound.find(b=>b.idx===i),
+    hand: bankedThisRound.find(b=>b.idx===i)?.hand
+  })).filter(p=>p.contrib>0);
 
-  // Flash deltas — all players who had skin in the game
+  // Sort ascending by contribution to process each side-pot level
+  const sortedByContrib=[...allIn].sort((a,b)=>a.contrib-b.contrib);
+  const awards={}; allIn.forEach(p=>{awards[p.idx]=0;});
+
+  let prevLevel=0;
+  let remaining=[...allIn]; // still eligible for this and higher pots
+
+  for(const entry of sortedByContrib){
+    if(entry.contrib<=prevLevel){
+      remaining=remaining.filter(r=>r.idx!==entry.idx);
+      continue;
+    }
+    const slice=entry.contrib-prevLevel;
+    const potSlice=slice*remaining.length;
+    // Winner of this slice = best hand among remaining players who can win
+    const eligible=remaining.filter(r=>r.canWin);
+    if(eligible.length>0){
+      const maxPts=Math.max(...eligible.map(r=>handScore(r.hand)));
+      const levelWinners=eligible.filter(r=>handScore(r.hand)===maxPts);
+      const share=Math.floor(potSlice/levelWinners.length);
+      const rem=potSlice-(share*levelWinners.length);
+      levelWinners.forEach((w,wi)=>{awards[w.idx]+=share+(wi<rem?1:0);});
+    }
+    prevLevel=entry.contrib;
+    remaining=remaining.filter(r=>r.idx!==entry.idx);
+  }
+
+  // Apply awards
+  Object.entries(awards).forEach(([i,amt])=>{pState[+i].bal+=amt;});
+
+  // Flash deltas
   players.forEach((_,i)=>{
-    if(bContrib[i]<=0)return;
-    const wEntry=winners.find(w=>w.idx===i);
-    const gain=wEntry?share:0;
-    flashDelta(i,gain-bContrib[i],true);
+    if((bContrib[i]||0)<=0)return;
+    flashDelta(i,(awards[i]||0)-bContrib[i],true);
   });
 
-  const totalPot=share*winners.length+rem;
+  // For display: show the player(s) with best hand as round winner
+  const maxPts=Math.max(...bankedThisRound.map(b=>handScore(b.hand)));
+  const winners=bankedThisRound.filter(b=>handScore(b.hand)===maxPts);
+  const totalPot=pot;
   pot=0;
   players.forEach((_,i)=>{if(pState[i].bal<=0)pState[i].eliminated=true;});
   betRound++;renderScoreboard();updateBelowStrip();
@@ -2755,10 +2905,12 @@ function betResolveRound(){
     const winHand=winners[0].hand;
     const handDisplay=winHand.kicker?`${winHand.name} · ${winHand.kicker}`:winHand.name;
     const isTie=winners.length>1;
+    // Show what the winner actually received (not raw pot, which may include returned stake)
+    const winnerReceived=winners.reduce((s,w)=>s+(awards[w.idx]||0),0);
     document.getElementById('wrm-label').textContent=isTie?'It\'s a Tie!':'Round Winner';
     document.getElementById('wrm-winner').textContent=isTie?winnerNames.join(' & '):winnerNames[0];
     document.getElementById('wrm-hand').textContent=handDisplay;
-    document.getElementById('wrm-pot').textContent=isTie?`Split ${fmt(totalPot)}`:`Wins ${fmt(totalPot)}`;
+    document.getElementById('wrm-pot').textContent=isTie?`Split ${fmt(winnerReceived)}`:`Wins ${fmt(winnerReceived)}`;
     document.getElementById('wild-round-modal').classList.add('visible');
     setBanner('','idle-turn');
     setStatus('');
@@ -2798,6 +2950,7 @@ function betShowHumanEliminated(){
   wl.className='final-winner-label eliminated';
   sub.textContent='Better luck next time';
   document.getElementById('overlay').classList.add('visible');
+  playLoseSound();
 }
 
 function betShowGameOver(){
@@ -2829,6 +2982,8 @@ function betShowGameOver(){
     wl.className='final-winner-label';
     sub.textContent='';
     document.getElementById('overlay').classList.add('visible');
+    const humanIdx=players.findIndex(p=>p.isHuman);
+    if(winners.includes(humanIdx)) playWinSound(); else playLoseSound();
     return;
   }
 
@@ -2840,10 +2995,13 @@ function betShowGameOver(){
   if(winners.length>1){wl.textContent="It's a Tie!";wl.className='final-winner-label tie';sub.textContent=`Tied at ${fmt(maxBal)}`;}
   else{wl.textContent=`${players[winners[0]].name} Wins!`;wl.className='final-winner-label';sub.textContent=`${players[winners[0]].name} finishes with ${fmt(pState[winners[0]].bal)} after ${betRound-1} rounds`;}
   document.getElementById('overlay').classList.add('visible');
+  const humanIdx=players.findIndex(p=>p.isHuman);
+  if(winners.includes(humanIdx)) playWinSound(); else playLoseSound();
 }
 
 // ── Rematch ───────────────────────────────────────────────────────────────────
 function rematch(){
+  stopFireworks();
   document.getElementById('overlay').classList.remove('visible');
   if(gameMode==='score')initScoreMode();else if(gameMode==='wild')initWildMode();else initBetMode();
 }
@@ -2921,6 +3079,7 @@ let _wildPendingIsCpu=false;
 function rollWildDie(isCpu=false){
   _wildPendingIsCpu=isCpu;
   document.getElementById('btn-roll').disabled=true;
+  playRollSound();
   const slot=document.getElementById('dice-tray');
   let ticks=0;
   const iv=setInterval(()=>{
@@ -2929,6 +3088,7 @@ function rollWildDie(isCpu=false){
     slot.appendChild(makeWildDie(Math.floor(Math.random()*6)+1,{rolling:true}));
     if(ticks>=9){
       clearInterval(iv);
+      stopRollSound();
       currentWildFace=Math.floor(Math.random()*6)+1;
       slot.innerHTML='';
       slot.appendChild(makeWildDie(currentWildFace));
@@ -3132,7 +3292,7 @@ let shakeEnabled = false;
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 const SETTINGS_KEY = 'pokerDiceSettings';
-const settings = Object.assign({ tableColour: 'green', diceColour: 'white', shakeMode: false, win95Mode: false, sfxEnabled: true },
+const settings = Object.assign({ tableColour: 'green', diceColour: 'white', shakeMode: false, win95Mode: false, sfxEnabled: true, musicEnabled: true },
   JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
 
 function saveSettings(){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
@@ -3167,6 +3327,9 @@ function applySettings(){
   document.getElementById('sopt-shake-on')?.classList.toggle('active',  settings.shakeMode);
   document.getElementById('sopt-sfx-off')?.classList.toggle('active', !settings.sfxEnabled);
   document.getElementById('sopt-sfx-on')?.classList.toggle('active',   settings.sfxEnabled);
+  document.getElementById('sopt-music-off')?.classList.toggle('active', !settings.musicEnabled);
+  document.getElementById('sopt-music-on')?.classList.toggle('active',   settings.musicEnabled);
+  if(settings.musicEnabled) _bgMusicResume(); else _bgMusicPause();
   // Re-render dice if active (win95 changes die appearance)
   try{
     if(typeof gameMode!=='undefined'){
@@ -3208,6 +3371,31 @@ function setWin95Mode(enable){
 function setSfxEnabled(enable){
   settings.sfxEnabled = enable; saveSettings(); applySettings();
 }
+
+function setMusicEnabled(enable){
+  settings.musicEnabled = enable; saveSettings(); applySettings();
+}
+
+// ── Background music ──────────────────────────────────────────────────────────
+let _bgAudio = null;
+function _bgMusicInit(){
+  if(_bgAudio) return;
+  _bgAudio = new Audio('/bg-music.mp3');
+  _bgAudio.loop = true;
+  _bgAudio.volume = 0.28;
+  _bgAudio.preload = 'auto';
+}
+function _bgMusicResume(){
+  _bgMusicInit();
+  if(_bgAudio.paused) _bgAudio.play().catch(()=>{});
+}
+function _bgMusicPause(){
+  if(_bgAudio && !_bgAudio.paused) _bgAudio.pause();
+}
+// Start music on first user interaction (autoplay policy)
+document.addEventListener('pointerdown', ()=>{
+  if(settings.musicEnabled) _bgMusicResume();
+}, {once: true});
 
 // Legacy stub — no longer used but kept in case of stale references
 function toggleShakeMode(){ setShakeMode(!shakeEnabled); }

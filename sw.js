@@ -1,4 +1,5 @@
-const CACHE = 'poker-dice-v8';
+const CACHE = 'poker-dice-v12';
+const LARGE = ['/bg-music.mp3']; // cached lazily on first request, not pre-cached
 const ASSETS = [
   '/',
   '/index.html',
@@ -10,7 +11,11 @@ const ASSETS = [
   '/dice-roll.mp3',
   '/btn-click.wav',
   '/btn-toggle.wav',
-  '/btn-chip.wav'
+  '/btn-chip.wav',
+  '/dice-hold.wav',
+  '/win.wav',
+  '/lose.wav',
+  '/player-add.wav'
 ];
 
 self.addEventListener('install', e => {
@@ -26,6 +31,20 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Large files: serve from cache if available, otherwise fetch and cache lazily
+  if(LARGE.some(u => e.request.url.endsWith(u))){
+    e.respondWith(
+      caches.match(e.request).then(cached => {
+        if(cached) return cached;
+        return fetch(e.request).then(res => {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+          return res;
+        });
+      })
+    );
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request))
   );
