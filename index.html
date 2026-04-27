@@ -1116,6 +1116,14 @@
         <button class="sopt"        id="sopt-shake-on"  onclick="setShakeMode(true)">On</button>
       </div>
     </div>
+
+    <div class="settings-row">
+      <div class="settings-label">Sound Effects</div>
+      <div class="sopt-group">
+        <button class="sopt"        id="sopt-sfx-off" onclick="setSfxEnabled(false)">Off</button>
+        <button class="sopt active" id="sopt-sfx-on"  onclick="setSfxEnabled(true)">On</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1959,6 +1967,7 @@ function freeRoll(){
     document.getElementById('free-bank-btn').style.pointerEvents='none';
     _startShakeLoop('free-dice-tray');
   }
+  playRollSound();
   clearTimeout(shakeTimer);
   shakeTimer=setTimeout(()=>_settleShake('free-dice-tray',true),900);
 }
@@ -2262,6 +2271,61 @@ function clearShake(){
   clearTimeout(shakeTimer);shakeTimer=null;
   shakeActive=false;
 }
+// ── Web Audio roll sound ─────────────────────────────────────────
+let _audioCtx=null, _rollBuffer=null, _clickBuffer=null, _toggleBuffer=null, _chipBuffer=null, _rollSource=null, _rollPending=false;
+function _initAudio(){
+  if(_audioCtx)return;
+  try{ _audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){return;}
+  const load=(url,cb)=>fetch(url).then(r=>r.arrayBuffer()).then(buf=>_audioCtx.decodeAudioData(buf)).then(cb).catch(()=>{});
+  load('/dice-roll.mp3', decoded=>{ _rollBuffer=decoded; if(_rollPending){_rollPending=false;_doPlayRoll();} });
+  load('/btn-click.wav',   decoded=>{ _clickBuffer=decoded; });
+  load('/btn-toggle.wav',  decoded=>{ _toggleBuffer=decoded; });
+  load('/btn-chip.wav',    decoded=>{ _chipBuffer=decoded; });
+}
+function _doPlayRoll(){
+  if(!_audioCtx||!_rollBuffer)return;
+  if(_rollSource){try{_rollSource.stop();}catch(e){}}
+  const src=_audioCtx.createBufferSource();
+  src.buffer=_rollBuffer;
+  src.connect(_audioCtx.destination);
+  src.start(0, 0.6);
+  _rollSource=src;
+}
+function playRollSound(){
+  if(!settings.sfxEnabled) return;
+  if(_audioCtx&&_audioCtx.state==='suspended') _audioCtx.resume();
+  if(!_rollBuffer){_rollPending=true;return;}
+  _doPlayRoll();
+}
+function stopRollSound(){
+  if(_rollSource){try{_rollSource.stop();}catch(e){} _rollSource=null;}
+}
+function playClickSound(buffer){
+  if(!settings.sfxEnabled||!_audioCtx||!buffer)return;
+  const wasSuspended=_audioCtx.state==='suspended';
+  if(wasSuspended) _audioCtx.resume();
+  const src=_audioCtx.createBufferSource();
+  src.buffer=buffer;
+  src.connect(_audioCtx.destination);
+  // If context was suspended, schedule 20ms ahead so hardware finishes spinning up before sound plays.
+  // All subsequent clicks use start(0) = instant.
+  src.start(wasSuspended ? _audioCtx.currentTime+0.02 : 0);
+}
+// Pre-load audio as early as possible so buffer is ready before first roll
+_initAudio();
+// Resume AudioContext on first interaction so it's already running when sounds fire
+['touchstart','mousedown'].forEach(evt=>
+  document.addEventListener(evt, ()=>{ if(_audioCtx&&_audioCtx.state==='suspended') _audioCtx.resume(); }, {once:false, passive:true})
+);
+// Delegated pointerdown handler — fires the instant finger touches down, zero perceived delay
+document.addEventListener('pointerdown', e=>{
+  const btn=e.target.closest('.btn,.btn-mode,.btn-setup,.sopt,.swatch,.chip,.mode-card,.settings-close');
+  if(!btn)return;
+  if(btn.id==='btn-roll'||btn.id==='free-roll-btn')return; // roll buttons have dice sound
+  const isToggle=btn.classList.contains('sopt');
+  const isChip=btn.classList.contains('chip');
+  playClickSound(isChip ? _chipBuffer : isToggle ? _toggleBuffer : _clickBuffer);
+}, true);
 function playerShakeRoll(){
   if(currentTurn!=='human')return;
   if(!shakeActive){
@@ -2272,6 +2336,7 @@ function playerShakeRoll(){
     document.getElementById('btn-bank').disabled=true;
     _startShakeLoop('dice-tray');
   }
+  playRollSound();
   clearTimeout(shakeTimer);
   shakeTimer=setTimeout(()=>_settleShake('dice-tray',false),900);
 }
@@ -3067,7 +3132,7 @@ let shakeEnabled = false;
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 const SETTINGS_KEY = 'pokerDiceSettings';
-const settings = Object.assign({ tableColour: 'green', diceColour: 'white', shakeMode: false, win95Mode: false },
+const settings = Object.assign({ tableColour: 'green', diceColour: 'white', shakeMode: false, win95Mode: false, sfxEnabled: true },
   JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'));
 
 function saveSettings(){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }
@@ -3100,6 +3165,8 @@ function applySettings(){
   });
   document.getElementById('sopt-shake-off')?.classList.toggle('active', !settings.shakeMode);
   document.getElementById('sopt-shake-on')?.classList.toggle('active',  settings.shakeMode);
+  document.getElementById('sopt-sfx-off')?.classList.toggle('active', !settings.sfxEnabled);
+  document.getElementById('sopt-sfx-on')?.classList.toggle('active',   settings.sfxEnabled);
   // Re-render dice if active (win95 changes die appearance)
   try{
     if(typeof gameMode!=='undefined'){
@@ -3138,6 +3205,10 @@ function setWin95Mode(enable){
   settings.win95Mode = enable; saveSettings(); applySettings();
 }
 
+function setSfxEnabled(enable){
+  settings.sfxEnabled = enable; saveSettings(); applySettings();
+}
+
 // Legacy stub — no longer used but kept in case of stale references
 function toggleShakeMode(){ setShakeMode(!shakeEnabled); }
 
@@ -3170,5 +3241,9 @@ document.addEventListener('touchmove', e => {
   e.preventDefault();
 }, { passive: false });
 </script>
+<audio id="sfx-roll" src="/dice-roll.mp3" preload="auto"></audio>
+<audio src="/btn-click.wav" preload="auto"></audio>
+<audio src="/btn-toggle.wav" preload="auto"></audio>
+<audio src="/btn-chip.wav" preload="auto"></audio>
 </body>
 </html>

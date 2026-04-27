@@ -6,7 +6,11 @@ const ASSETS = [
   '/icon-192.png',
   '/icon-512.png',
   '/apple-touch-icon.png',
-  '/LoungeBait.ttf'
+  '/LoungeBait.ttf',
+  '/dice-roll.mp3',
+  '/btn-click.wav',
+  '/btn-toggle.wav',
+  '/btn-chip.wav'
 ];
 
 self.addEventListener('install', e => {
