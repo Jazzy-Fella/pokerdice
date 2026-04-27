@@ -2789,35 +2789,61 @@ function cpuBettingAction(idx){
   const toCall=bCurrent-bContrib[idx];
   const bal=pState[idx].bal;
 
-  if(toCall>0&&bal<toCall){
-    if(bal<=MIN_ANTE){
-      // Short stack — must go all in, cannot fold
-      setStatus('All in!');
-      setTimeout(()=>doCall(idx),CPU_THINK*0.6);
+  // Short stack — always call all-in, never fold (nothing meaningful left to protect)
+  if(bal<=MIN_ANTE){
+    setStatus('All in!');
+    setTimeout(()=>doCall(idx),CPU_THINK*0.6);
+    return;
+  }
+
+  // Free action — check, or occasionally raise
+  if(toCall<=0){
+    const noneRaised=bCurrent===MIN_ANTE;
+    if(noneRaised&&bal>=MIN_RAISE*2&&Math.random()<0.18){
+      setStatus('Raising!');
+      setTimeout(()=>doRaise(idx,MIN_RAISE),CPU_THINK);
     } else {
-      setStatus("Can't call — folds.");
-      setTimeout(()=>doFold(idx),CPU_THINK*0.6);
+      setStatus('Checks.');
+      setTimeout(()=>doCall(idx),CPU_THINK*0.8);
     }
     return;
   }
-  if(toCall>bal*0.5&&bal>MIN_ANTE){
-    // Expensive call — fold probability scales with how much of stack is at risk
-    // Near all-in: rarely fold (25%); moderately expensive: fold 40%
-    const foldChance=toCall>=bal*0.9?0.25:0.40;
-    setStatus('Considering…');
-    setTimeout(()=>Math.random()<foldChance?doFold(idx):doCall(idx),CPU_THINK);
+
+  // In poker you can always call up to your remaining stack (go all-in).
+  // Never auto-fold just because the bet exceeds your balance.
+  const effectiveCall=Math.min(toCall,bal);
+  const goingAllin=toCall>=bal;
+
+  // Fold probability based on what fraction of stack the effective call costs
+  const stackFraction=effectiveCall/bal;
+  let foldChance;
+  if(goingAllin){
+    foldChance=0.38; // facing an all-in: call ~62% of the time
+  } else if(stackFraction>=0.75){
+    foldChance=0.28;
+  } else if(stackFraction>=0.50){
+    foldChance=0.18;
+  } else if(stackFraction>=0.25){
+    foldChance=0.10;
+  } else {
+    foldChance=0.05;
+  }
+
+  if(Math.random()<foldChance){
+    setStatus('Folds.');
+    setTimeout(()=>doFold(idx),CPU_THINK);
     return;
   }
-  // Occasionally raise (15%) if no one has raised yet and they can afford it
-  const noneRaised=bCurrent===MIN_ANTE;
-  if(noneRaised&&bal>=toCall+MIN_RAISE*2&&Math.random()<0.15){
-    setStatus('Raising!');
+
+  // Occasionally re-raise on cheap calls
+  if(!goingAllin&&stackFraction<0.35&&Math.random()<0.15&&bal>=toCall+MIN_RAISE*2){
+    setStatus('Raises!');
     setTimeout(()=>doRaise(idx,MIN_RAISE),CPU_THINK);
     return;
   }
-  // Otherwise call/check
-  setStatus(toCall>0?'Calls.':'Checks.');
-  setTimeout(()=>doCall(idx),CPU_THINK*0.8);
+
+  setStatus(goingAllin?'All in!':'Calls.');
+  setTimeout(()=>doCall(idx),CPU_THINK*0.9);
 }
 
 // ── Rolling phase (after betting settles) ─────────────────────────────────────
