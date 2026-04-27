@@ -395,6 +395,8 @@
 
     /* ── Classic mode scoreboard (no ps-value row) ── */
     #free-scoreboard .ps-hand { min-height: unset; height: 2.8em; overflow: hidden; }
+    /* Prevent player cards from shrinking when hand result text is added */
+    #free-scoreboard .ps { min-height: calc(22px + 2.4rem); }
     #free-scoreboard { border-radius: 14px; border-bottom: 1px solid rgba(255,215,0,0.25); margin-bottom: 6px; }
     #free-scoreboard .ps:first-child { border-radius: 14px 0 0 14px; }
     #free-scoreboard .ps:last-child  { border-radius: 0 14px 14px 0; }
@@ -1901,6 +1903,10 @@ function freeStartTurn(){
   dice=randomDice();
   held=[false,false,false,false,false];
   rollsLeft=3;hasRolled=false;
+  // Release the height lock set by freeBankHand so the scoreboard
+  // can size naturally for the new player's active-turn state.
+  const _sbLock=document.getElementById('free-scoreboard');
+  if(_sbLock) _sbLock.style.minHeight='';
   freeRenderScoreboard();
   // Player label — only shown in single-player (scoreboard replaces it in multiplayer)
   const lbl=document.getElementById('free-player-label');
@@ -1963,6 +1969,11 @@ function freeToggleHold(i){
 function freeBankHand(){
   rollsLeft=0;
   freeRecordResult();
+  // Lock the scoreboard at its current rendered height before updating cards.
+  // This prevents any content change from shrinking the scoreboard and
+  // shifting the table/dice area upward.
+  const sb=document.getElementById('free-scoreboard');
+  if(sb&&sb.offsetHeight>0) sb.style.minHeight=sb.offsetHeight+'px';
   freeRenderScoreboard();
   document.getElementById('free-bank-btn').style.visibility='hidden';
   document.getElementById('free-bank-btn').style.pointerEvents='none';
