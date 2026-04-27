@@ -2288,7 +2288,7 @@ function _doPlayRoll(){
   const src=_audioCtx.createBufferSource();
   src.buffer=_rollBuffer;
   src.connect(_audioCtx.destination);
-  src.start(0, 0.5);
+  src.start(0, 0.45);
   _rollSource=src;
 }
 function playRollSound(){
