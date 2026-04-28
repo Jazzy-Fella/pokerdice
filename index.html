@@ -298,6 +298,12 @@
       75%  { transform: rotate(10deg)  translateY(-2px); }
       100% { transform: rotate(-10deg) translateY(0); }
     }
+    @keyframes die-settle {
+      0%   { transform: scale(1.1) rotate(3deg); }
+      55%  { transform: scale(0.97) rotate(-1deg); }
+      100% { transform: scale(1)   rotate(0deg); }
+    }
+    .die.just-settled { animation: die-settle 0.28s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 
     .held-badge {
       position: absolute; top: -8px; right: -8px;
@@ -1825,8 +1831,13 @@ function animateRoll(isCpu,onDone){
   const iv=setInterval(()=>{
     ticks++;
     dice=dice.map((f,i)=>held[i]?f:FACES[Math.floor(Math.random()*6)]);
-    renderTray('dice-tray',dice,held,{isCpu,rollingMask:dice.map((_,i)=>!held[i]&&ticks<7),...wildRenderOpts()});
-    if(ticks>=7){clearInterval(iv);onDone();}
+    const isLast=ticks>=7;
+    renderTray('dice-tray',dice,held,{isCpu,rollingMask:dice.map((_,i)=>!held[i]&&!isLast),...wildRenderOpts()});
+    if(isLast){
+      clearInterval(iv);
+      document.querySelectorAll('#dice-tray .die:not(.held):not(.cpu-held)').forEach(d=>d.classList.add('just-settled'));
+      onDone();
+    }
   },65);
 }
 
@@ -2504,7 +2515,9 @@ function _settleShake(trayId,isFree){
   clearShake();
   dice=dice.map((f,i)=>(held[i]&&f)||i===wildLockedDieIdx?f:FACES[Math.floor(Math.random()*6)]);
   if(isFree){
-    freeRenderTray();freeUpdateHand();
+    freeRenderTray();
+    document.querySelectorAll('#free-dice-tray .die:not(.held):not(.cpu-held)').forEach(d=>d.classList.add('just-settled'));
+    freeUpdateHand();
     document.getElementById('free-rolls-text').textContent=rollsLeft===1?'1 roll remaining':`${rollsLeft} rolls remaining`;
     for(let i=0;i<3;i++)document.getElementById(`free-pip-${i}`).className='pip'+(i<rollsLeft?' active':'');
     if(rollsLeft===0){
@@ -2523,6 +2536,7 @@ function _settleShake(trayId,isFree){
     const canRoll=rollsLeft>0;
     const wOpts=wildRenderOpts();
     renderTray(trayId,dice,held,{holdable:canRoll&&!wildCharge,onClickFn:canRoll?toggleHold:null,...wOpts});
+    document.querySelectorAll(`#${trayId} .die:not(.held):not(.cpu-held)`).forEach(d=>d.classList.add('just-settled'));
     if(wildCharge)setStatus('★ Tap any die to set its face, or keep rolling!');
     else setStatus(rollsLeft===0?'No rolls left — bank your hand!':rollsLeft===1?'Last roll!':'Hold dice to keep, then shake again or bank');
     document.getElementById('btn-roll').textContent='Shake & Roll';
