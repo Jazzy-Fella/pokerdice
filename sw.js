@@ -1,4 +1,4 @@
-const CACHE = 'poker-dice-v14';
+const CACHE = 'poker-dice-v15';
 const LARGE = ['/bg-music.mp3']; // cached lazily on first request, not pre-cached
 const ASSETS = [
   '/',
@@ -31,8 +31,20 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // index.html: network-first so JS/CSS changes always apply immediately
+  const url = e.request.url;
+  if(url.endsWith('/') || url.endsWith('/index.html')){
+    e.respondWith(
+      fetch(e.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return res;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
   // Large files: serve from cache if available, otherwise fetch and cache lazily
-  if(LARGE.some(u => e.request.url.endsWith(u))){
+  if(LARGE.some(u => url.endsWith(u))){
     e.respondWith(
       caches.match(e.request).then(cached => {
         if(cached) return cached;
