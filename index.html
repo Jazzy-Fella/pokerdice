@@ -44,6 +44,8 @@
     }
     h1 { font-size: clamp(4.8rem, 18vw, 8rem); font-weight: normal; letter-spacing: 0.05em; margin-bottom: 12px; color: #ffd700; text-align: center; font-family: 'LoungeBait', 'Cormorant Garamond', serif; white-space: nowrap; animation: title-breathe 3.6s ease-in-out infinite; background: linear-gradient(to bottom, #fff5a0 0%, #ffd700 40%, #c87800 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .subtitle { font-size: 0.82rem; color: #a8c8a0; margin-bottom: 20px; }
+    #screen-curtain { position: fixed; inset: 0; background: #0a1810; z-index: 998; pointer-events: none; opacity: 0; transition: opacity 0.22s ease; }
+    #screen-curtain.fading { opacity: 1; }
 
     /* ── Mode select ─────────────────────────────── */
     #mode-select {
@@ -1039,6 +1041,7 @@
 </svg>
 
 <!-- ── MODE SELECT ─────────────────────────────────────────────────── -->
+<div id="screen-curtain"></div>
 <div id="mode-select">
   <h1>Poker Dice</h1>
   <div class="mode-card free-card" onclick="selectMode('free')">
@@ -2108,13 +2111,20 @@ function freeUpdateHand(){
 }
 
 // ── Mode select & player setup ────────────────────────────────────────────────
+function fadeSwitch(fn){
+  const c=document.getElementById('screen-curtain');
+  c.classList.add('fading');
+  setTimeout(()=>{fn();requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.remove('fading')));},220);
+}
 function selectMode(mode){
   gameMode=mode;
-  document.getElementById('mode-select').style.display='none';
-  const modeTitle=mode==='score'?'🎯 Score Mode':mode==='wild'?'🃏 Wild Mode':mode==='free'?'🎲 Classic Mode':'💰 Betting Mode';
-  document.getElementById('setup-title').textContent=modeTitle+' — Players';
-  renderSetupRows();
-  document.getElementById('player-setup').style.display='flex';
+  fadeSwitch(()=>{
+    document.getElementById('mode-select').style.display='none';
+    const modeTitle=mode==='score'?'🎯 Score Mode':mode==='wild'?'🃏 Wild Mode':mode==='free'?'🎲 Classic Mode':'💰 Betting Mode';
+    document.getElementById('setup-title').textContent=modeTitle+' — Players';
+    renderSetupRows();
+    document.getElementById('player-setup').style.display='flex';
+  });
 }
 function renderSetupRows(){
   const container=document.getElementById('player-rows');container.innerHTML='';
@@ -2156,11 +2166,13 @@ function startGame(){
   // Clear WebKit undo history on all text inputs — prevents iOS "Undo Typing" dialog when shaking
   document.querySelectorAll('input[type="text"]').forEach(inp=>{const v=inp.value;inp.value='';inp.value=v;inp.blur();});
   players=setupPlayers.map(p=>({name:(p.name||'Player').trim(),isHuman:p.isHuman}));
-  document.getElementById('player-setup').style.display='none';
-  if(gameMode==='free'){initFreeMode();return;}
-  document.getElementById('game-screen').style.display='flex';
-  document.getElementById('game-change-mode-btn').style.display='block';
-  if(gameMode==='score')initScoreMode();else if(gameMode==='wild')initWildMode();else initBetMode();
+  fadeSwitch(()=>{
+    document.getElementById('player-setup').style.display='none';
+    if(gameMode==='free'){initFreeMode();return;}
+    document.getElementById('game-screen').style.display='flex';
+    document.getElementById('game-change-mode-btn').style.display='block';
+    if(gameMode==='score')initScoreMode();else if(gameMode==='wild')initWildMode();else initBetMode();
+  });
 }
 function goToModeSelect(){
   stopFireworks();
@@ -2169,14 +2181,16 @@ function goToModeSelect(){
   document.activeElement?.blur();
   document.getElementById('overlay').classList.remove('visible');
   document.getElementById('wild-round-modal').classList.remove('visible');
-  document.getElementById('game-screen').style.display='none';
-  document.getElementById('game-change-mode-btn').style.display='none';
-  document.getElementById('player-setup').style.display='none';
-  document.getElementById('free-screen').style.display='none';
-  document.getElementById('free-change-mode-btn').style.display='none';
-  document.getElementById('score-hand-ref').style.display='none';
-  document.getElementById('mode-select').style.display='flex';
-  document.getElementById('settings-cog').style.display='flex';
+  fadeSwitch(()=>{
+    document.getElementById('game-screen').style.display='none';
+    document.getElementById('game-change-mode-btn').style.display='none';
+    document.getElementById('player-setup').style.display='none';
+    document.getElementById('free-screen').style.display='none';
+    document.getElementById('free-change-mode-btn').style.display='none';
+    document.getElementById('score-hand-ref').style.display='none';
+    document.getElementById('mode-select').style.display='flex';
+    document.getElementById('settings-cog').style.display='flex';
+  });
 }
 
 // ── Shared turn engine ────────────────────────────────────────────────────────
@@ -3435,7 +3449,7 @@ function _bgMusicInit(){
   if(_bgAudio) return;
   _bgAudio = new Audio('/bg-music.mp3');
   _bgAudio.loop = true;
-  _bgAudio.volume = 0.18;
+  _bgAudio.volume = 0.12;
   _bgAudio.preload = 'auto';
 }
 function _bgMusicResume(){
