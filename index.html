@@ -1123,11 +1123,12 @@
       <div class="settings-row">
         <div class="settings-label">Dice Colour</div>
         <div class="swatch-group">
-          <button class="swatch active" id="sopt-dice-white" onclick="setDiceColour('white')" style="background:#f0f0f0" title="White dice"></button>
-          <button class="swatch"        id="sopt-dice-red"   onclick="setDiceColour('red')"   style="background:#cc2222" title="Red dice"></button>
-          <button class="swatch"        id="sopt-dice-blue"  onclick="setDiceColour('blue')"  style="background:#1a44cc" title="Blue dice"></button>
-          <button class="swatch"        id="sopt-dice-green" onclick="setDiceColour('green')" style="background:#1e8c3a" title="Green dice"></button>
-          <button class="swatch"        id="sopt-dice-black" onclick="setDiceColour('black')" style="background:#111111" title="Black dice"></button>
+          <button class="swatch active" id="sopt-dice-white"   onclick="setDiceColour('white')"   style="background:#f0f0f0" title="White dice"></button>
+          <button class="swatch"        id="sopt-dice-red"     onclick="setDiceColour('red')"     style="background:#cc2222" title="Red dice"></button>
+          <button class="swatch"        id="sopt-dice-blue"    onclick="setDiceColour('blue')"    style="background:#1a44cc" title="Blue dice"></button>
+          <button class="swatch"        id="sopt-dice-green"   onclick="setDiceColour('green')"   style="background:#1e8c3a" title="Green dice"></button>
+          <button class="swatch"        id="sopt-dice-black"   onclick="setDiceColour('black')"   style="background:#111111" title="Black dice"></button>
+          <button class="swatch"        id="sopt-dice-rainbow" onclick="setDiceColour('rainbow')" style="background:linear-gradient(135deg,#f0f0f0 20%,#cc2222 20%,#cc2222 40%,#1a44cc 40%,#1a44cc 60%,#1e8c3a 60%,#1e8c3a 80%,#111111 80%)" title="Rainbow dice"></button>
         </div>
       </div>
     </div>
@@ -1625,7 +1626,8 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
         <line x1="7" y1="113" x2="113" y2="113" stroke="#404040" stroke-width="1.5"/>
       </svg><div class="held-badge">held</div>`;
     } else {
-      const _dc = (typeof settings !== 'undefined') ? settings.diceColour : 'white';
+      const _dcRaw = (typeof settings !== 'undefined') ? settings.diceColour : 'white';
+      const _dc = _dcRaw==='rainbow' ? ['white','red','blue','green','black'][Math.floor(Math.random()*5)] : _dcRaw;
       const _ef = {white:'#ffffff',red:'#cc2222',green:'#1e8c3a',blue:'#1a44cc',black:'#111111'}[_dc]||'#ffffff';
       const _es = {white:'#c8c8c8',red:'#991111',green:'#146030',blue:'#112299',black:'#555555'}[_dc]||'#c8c8c8';
       el.innerHTML=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
@@ -1722,7 +1724,8 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
   }
 
   // State → face fill and border stroke
-  const dc = (typeof settings !== 'undefined') ? settings.diceColour : 'white';
+  const _dcRaw2 = (typeof settings !== 'undefined') ? settings.diceColour : 'white';
+  const dc = _dcRaw2==='rainbow' ? ['white','red','blue','green','black'][Math.floor(Math.random()*5)] : _dcRaw2;
   const _base  = {white:'#ffffff', red:'#cc2222', green:'#1e8c3a', blue:'#1a44cc', black:'#111111'}[dc]||'#ffffff';
   const _held  = {white:'#fffce8', red:'#ff9999', green:'#99eebb', blue:'#aabfff', black:'#3a3a3a'}[dc]||'#fffce8';
   const _cpu   = {white:'#f5eeff', red:'#cc2244', green:'#2a6642', blue:'#223388', black:'#252525'}[dc]||'#f5eeff';
@@ -3400,7 +3403,7 @@ function applySettings(){
     const el=document.getElementById(`sopt-table-${v}`);
     if(el) el.classList.toggle('active', settings.tableColour===v);
   });
-  ['white','red','blue','green','black'].forEach(v=>{
+  ['white','red','blue','green','black','rainbow'].forEach(v=>{
     const el=document.getElementById(`sopt-dice-${v}`);
     if(el) el.classList.toggle('active', settings.diceColour===v);
   });
@@ -3423,6 +3426,7 @@ function applySettings(){
 
 function openSettings(){ document.getElementById('settings-modal').classList.add('visible'); }
 function closeSettings(){ document.getElementById('settings-modal').classList.remove('visible'); }
+
 
 function setTableColour(v){
   settings.tableColour=v; saveSettings(); applySettings();
@@ -3463,7 +3467,7 @@ function _bgMusicInit(){
   if(_bgAudio) return;
   _bgAudio = new Audio('/bg-music.mp3');
   _bgAudio.loop = true;
-  _bgAudio.volume = 0.12;
+  _bgAudio.volume = 0.08;
   _bgAudio.preload = 'auto';
 }
 function _bgMusicResume(){
