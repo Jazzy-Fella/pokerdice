@@ -1,4 +1,4 @@
-const CACHE = 'poker-dice-v13';
+const CACHE = 'poker-dice-v14';
 const LARGE = ['/bg-music.mp3']; // cached lazily on first request, not pre-cached
 const ASSETS = [
   '/',
