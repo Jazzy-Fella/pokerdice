@@ -284,6 +284,7 @@
     .die svg { display: block; width: 100%; height: 100%; }
     .die.full { width: 92px; height: 92px; cursor: pointer; }
     .die.mini { width: 48px; height: 48px; cursor: default; }
+    .die.full.holdable::after { content: ''; position: absolute; inset: -14px; }
     .die.full:hover.holdable { transform: translateY(-5px); filter: drop-shadow(4px 12px 16px rgba(0,0,0,0.65)); }
 
     .die.held     { transform: translateY(-4px); filter: drop-shadow(4px 10px 14px rgba(0,0,0,0.55)) drop-shadow(0 0 5px rgba(255,215,0,0.95)); }
