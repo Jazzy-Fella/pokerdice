@@ -305,6 +305,8 @@
       100% { transform: scale(1)   rotate(0deg); }
     }
     .die.just-settled { animation: die-settle 0.28s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+    @keyframes die-unheld { from { transform: translateY(-4px); } to { transform: translateY(0); } }
+    .die.just-unheld { animation: die-unheld 0.15s ease-out forwards; }
 
     .held-badge {
       position: absolute; top: -8px; right: -8px;
@@ -1811,7 +1813,9 @@ function wildRenderOpts(){
   };
 }
 function renderTray(id,diceArr,heldArr,opts={}){
-  const tray=document.getElementById(id);tray.innerHTML='';
+  const tray=document.getElementById(id);
+  const wasHeld=[...tray.querySelectorAll('.die')].map(d=>d.classList.contains('held')||d.classList.contains('cpu-held'));
+  tray.innerHTML='';
   const preRoll=!hasRolled;
   diceArr.forEach((face,i)=>{
     const isLocked=opts.lockedIdx===i;
@@ -1828,6 +1832,11 @@ function renderTray(id,diceArr,heldArr,opts={}){
       isRevealed,
       isWildTarget:!!opts.wildChargeable&&!heldArr[i]&&!isLocked,
     }));
+  });
+  // Animate dice that just became unheld back down
+  [...tray.querySelectorAll('.die')].forEach((d,i)=>{
+    if(wasHeld[i]&&!d.classList.contains('held')&&!d.classList.contains('cpu-held'))
+      d.classList.add('just-unheld');
   });
 }
 function animateRoll(isCpu,onDone){
