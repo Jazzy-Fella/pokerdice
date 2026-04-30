@@ -280,6 +280,7 @@
       transition: transform 0.15s, filter 0.15s;
       user-select: none;
       will-change: transform, filter;
+      touch-action: none;
     }
     .die svg { display: block; width: 100%; height: 100%; }
     .die.full { width: 92px; height: 92px; cursor: pointer; }
@@ -3561,7 +3562,8 @@ document.addEventListener('visibilitychange', ()=>{
 document.addEventListener('touchmove', e => {
   let el = e.target;
   while (el && el !== document.body) {
-    if (el.scrollHeight > el.clientHeight) return; // let it scroll
+    // Skip SVG elements — their scrollHeight/clientHeight are unreliable
+    if (el.tagName && el.tagName.toLowerCase() !== 'svg' && !(el.ownerSVGElement) && el.scrollHeight > el.clientHeight) return;
     el = el.parentElement;
   }
   e.preventDefault();
