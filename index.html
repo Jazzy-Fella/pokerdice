@@ -1821,13 +1821,12 @@ function wildRenderOpts(){
 function renderTray(id,diceArr,heldArr,opts={}){
   const tray=document.getElementById(id);
   const wasHeld=[...tray.querySelectorAll('.die')].map(d=>d.classList.contains('held')||d.classList.contains('cpu-held'));
-  tray.innerHTML='';
   const preRoll=!hasRolled;
-  diceArr.forEach((face,i)=>{
+  const newDice=diceArr.map((face,i)=>{
     const isLocked=opts.lockedIdx===i;
     const isWildBlank=!!(opts.blankMask&&opts.blankMask[i]);
     const isRevealed=!!(opts.revealMask&&opts.revealMask[i]);
-    tray.appendChild(makeDie(face,{
+    return makeDie(face,{
       isHeld:!opts.isCpu&&heldArr[i],isCpuHeld:opts.isCpu&&heldArr[i],
       size:opts.size||'full',holdable:opts.holdable||false,
       rolling:opts.rollingMask?opts.rollingMask[i]:false,
@@ -1837,10 +1836,12 @@ function renderTray(id,diceArr,heldArr,opts={}){
       isLocked,
       isRevealed,
       isWildTarget:!!opts.wildChargeable&&!heldArr[i]&&!isLocked,
-    }));
+    });
   });
+  // Swap all dice atomically — no empty-tray gap that lets touches fall through to buttons below
+  tray.replaceChildren(...newDice);
   // Animate dice that just became unheld back down
-  [...tray.querySelectorAll('.die')].forEach((d,i)=>{
+  newDice.forEach((d,i)=>{
     if(wasHeld[i]&&!d.classList.contains('held')&&!d.classList.contains('cpu-held'))
       d.classList.add('just-unheld');
   });
