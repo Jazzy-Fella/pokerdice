@@ -1738,7 +1738,7 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
   const _stroke= {white:'#c8c8c8', red:'#991111', green:'#146030', blue:'#112299', black:'#555555'}[dc]||'#c8c8c8';
   const _dark  = dc !== 'white';
   const faceFill    = isRevealed ? (_dark?_held:'#e8f6ff') : isCpuHeld ? _cpu : isHeld ? _held : _base;
-  const strokeColor = isRevealed ? '#44aaff' : isCpuHeld ? '#bb66ff' : isHeld ? '#ffd700' : _stroke;
+  const strokeColor = isRevealed ? '#44aaff' : (isCpuHeld||isHeld) ? (_holdColor||'#ffd700') : _stroke;
   const strokeWidth = isRevealed ? 4 : (isCpuHeld||isHeld) ? 4 : 1.5;
 
   // Main face value text — centered in the 120×120 viewBox (center = 60,60)
@@ -2233,7 +2233,9 @@ function findNextUnbanked(afterIdx){
   }
   return -1;
 }
+let _holdColor='#ffd700';
 function updateHoldGlow(idx){
+  _holdColor=PLAYER_COLORS[idx]??'#ffd700';
   ['dice-tray','free-dice-tray'].forEach(id=>{
     const t=document.getElementById(id);
     if(!t)return;
