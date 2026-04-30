@@ -287,7 +287,10 @@
     .die.full.holdable::after { content: ''; position: absolute; inset: -14px; }
     .die.full:hover.holdable { transform: translateY(-5px); filter: drop-shadow(4px 12px 16px rgba(0,0,0,0.65)); }
 
-    .die.held     { transform: translateY(-4px); filter: drop-shadow(4px 10px 14px rgba(0,0,0,0.55)) drop-shadow(0 0 8px var(--hold-glow,#ffd700)); }
+    .die.held     { transform: translateY(-4px); filter: drop-shadow(4px 10px 14px rgba(0,0,0,0.55)) drop-shadow(0 0 8px #ffd700); }
+    .active-p1 .die.held { filter: drop-shadow(4px 10px 14px rgba(0,0,0,0.55)) drop-shadow(0 0 8px #cc88ff); }
+    .active-p2 .die.held { filter: drop-shadow(4px 10px 14px rgba(0,0,0,0.55)) drop-shadow(0 0 8px #44ddff); }
+    .active-p3 .die.held { filter: drop-shadow(4px 10px 14px rgba(0,0,0,0.55)) drop-shadow(0 0 8px #ff9944); }
     .die.cpu-held { transform: translateY(-4px); filter: drop-shadow(4px 10px 14px rgba(0,0,0,0.55)) drop-shadow(0 0 5px rgba(180,100,220,0.95)); }
 
     /* Rolling: tumble the SVG itself */
@@ -2231,7 +2234,12 @@ function findNextUnbanked(afterIdx){
   return -1;
 }
 function updateHoldGlow(idx){
-  document.documentElement.style.setProperty('--hold-glow', PLAYER_COLORS[idx]??'#ffd700');
+  ['dice-tray','free-dice-tray'].forEach(id=>{
+    const t=document.getElementById(id);
+    if(!t)return;
+    t.classList.remove('active-p0','active-p1','active-p2','active-p3');
+    t.classList.add(`active-p${idx}`);
+  });
 }
 function startTurn(idx){
   clearShake();
