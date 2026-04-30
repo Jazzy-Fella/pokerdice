@@ -3183,6 +3183,32 @@ function wildRoundModalContinue(){
 }
 let _wildPendingIsCpu=false;
 
+function wildBurst(el,color){
+  const r=el.getBoundingClientRect();
+  const cx=r.left+r.width/2, cy=r.top+r.height/2;
+  // Particles
+  for(let i=0;i<26;i++){
+    const p=document.createElement('div');
+    const angle=(i/26)*Math.PI*2+(Math.random()-0.5)*0.5;
+    const dist=50+Math.random()*70;
+    const size=3+Math.random()*6;
+    const dur=0.45+Math.random()*0.35;
+    p.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;width:${size}px;height:${size}px;border-radius:50%;background:${color};pointer-events:none;z-index:9999;transform:translate(-50%,-50%);opacity:1;box-shadow:0 0 ${size+3}px ${color};transition:transform ${dur}s ease-out,opacity ${dur}s ease-out;`;
+    document.body.appendChild(p);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      p.style.transform=`translate(calc(-50% + ${(Math.cos(angle)*dist).toFixed(1)}px),calc(-50% + ${(Math.sin(angle)*dist).toFixed(1)}px))`;
+      p.style.opacity='0';
+    }));
+    setTimeout(()=>p.remove(),(dur+0.15)*1000);
+  }
+  // Expanding ring
+  const ring=document.createElement('div');
+  ring.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;width:24px;height:24px;border-radius:50%;border:3px solid ${color};pointer-events:none;z-index:9998;transform:translate(-50%,-50%) scale(1);opacity:0.9;transition:transform 0.55s ease-out,opacity 0.55s ease-out;`;
+  document.body.appendChild(ring);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ring.style.transform='translate(-50%,-50%) scale(5.5)';ring.style.opacity='0';}));
+  setTimeout(()=>ring.remove(),700);
+}
+
 function rollWildDie(isCpu=false){
   _wildPendingIsCpu=isCpu;
   document.getElementById('btn-roll').disabled=true;
@@ -3198,7 +3224,9 @@ function rollWildDie(isCpu=false){
       stopRollSound();
       currentWildFace=Math.floor(Math.random()*6)+1;
       slot.innerHTML='';
-      slot.appendChild(makeWildDie(currentWildFace));
+      const _wdEl=makeWildDie(currentWildFace);
+      slot.appendChild(_wdEl);
+      setTimeout(()=>wildBurst(_wdEl,WILD_FACES[currentWildFace-1].color),40);
       const w=WILD_FACES[currentWildFace-1];
       setBanner(w.title,isCpu?'cpu-turn':'human-turn');
       setStatus(w.desc);
