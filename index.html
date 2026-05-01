@@ -1613,6 +1613,7 @@ function makeDie(face,{isHeld=false,isCpuHeld=false,size='full',holdable=false,r
   const el=document.createElement('div');
   el.className=`die ${size}${isCpuHeld?' cpu-held':isHeld?' held':''}${rolling?' rolling':''}${holdable?' holdable':''}${isWildTarget?' wild-targetable':''}`;
   if(onClick){
+    el.addEventListener('touchstart',e=>{e.preventDefault();},{passive:false});
     el.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();onClick();},{passive:false});
     el.onclick=onClick; // mouse fallback
   }
